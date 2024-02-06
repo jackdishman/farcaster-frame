@@ -1,15 +1,18 @@
 
 export async function GET(request: Request) {
-    const punApi = `https://icanhazdadjoke.com/`
-    const punHeaders = new Headers()    
-    punHeaders.append('Accept', 'application/json')
-    const punRequest = new Request(punApi, {
-        headers: punHeaders,
-    })
-    const punResponse = await fetch(punRequest)
+    const punApi = `https://punapi.rest/api/meme`
+    const punResponse = await fetch(punApi)
+    console.log(punResponse)
     const punJson = await punResponse.json()
-    const pun = punJson.joke
-    console.log(pun)
+    console.log(punJson)
+    // const punHeaders = new Headers()    
+    // punHeaders.append('Accept', 'application/json')
+    // const punRequest = new Request(punApi)
+    // const punResponse = await fetch(punRequest)
+    // const punJson = await punResponse.json()
+    // console.log(punJson)
+    // const pun = punJson.pun
+    // console.log(pun)
 
     const head = new Headers()
     const meta = `
