@@ -4,6 +4,8 @@ export async function POST(request: Request) {
 
     const responseBuilder = (title: string) => {
         const head = new Headers()
+        head.append('Content-Type', 'text/html')
+
         const meta = `
             <meta property="og:title" content="${title}">
             <meta property="og:image" content="https://farcaster-frame-lemon.vercel.app/header.jpeg">
@@ -41,6 +43,7 @@ export async function POST(request: Request) {
     })
 
     const head = new Headers()
+    head.append('Content-Type', 'text/html')
     const meta = `
     <meta property="og:title" content="Submit an attestation">
     <meta property="og:image" content="https://farcaster-frame-lemon.vercel.app/header.jpeg">
