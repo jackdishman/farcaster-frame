@@ -5,12 +5,12 @@ export interface IQuiz {
     title: string | null
 }
 
-export interface ISubmissions {
+export interface ISubmission {
     answers: {} | null
     created_at: string
     id: number
     quiz_id: number | null
-    student_name: string | null
+    fid: string | null
 }
 
 export interface IQuestion {

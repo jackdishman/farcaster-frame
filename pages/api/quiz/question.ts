@@ -1,5 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import {getSSLHubRpcClient, Message} from "@farcaster/hub-nodejs";
+import { createSubmission, getQuestions } from '@/helpers';
+import { ISubmission } from '@/app/types/types';
 
 const HUB_URL = process.env['HUB_URL']
 const client = HUB_URL ? getSSLHubRpcClient(HUB_URL) : undefined;
@@ -7,14 +9,56 @@ const client = HUB_URL ? getSSLHubRpcClient(HUB_URL) : undefined;
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
     if (req.method === 'POST') {
         try {
-            const quizId = req.query['quiz_id']
+            const quizId = req.query['quiz_id'] as string
             const questionId = req.query['question_id']
-            const answer = req.body['answer']
+
+            if(!quizId) {
+                return res.status(400).send('Missing quiz_id');
+            }
+
+            // IF no questionId, then send the first question and create a new submission entry (if does not exist)
+            let submission:ISubmission | undefined = undefined;
+            if(!questionId) {
+                submission = await createSubmission(quizId, req.body?.untrustedData?.fid || '');
+                // get first question
+                const questions = await getQuestions(quizId);
+                if (!questions || questions.length === 0) {
+                    return res.status(404).send('No questions found');
+                }
+                const question = questions[0];
+                const imageUrl = `${process.env['HOST']}/api/quiz/image-question?text=${question.text}`;
+                res.setHeader('Content-Type', 'text/html');
+                res.status(200).send(`
+                <!DOCTYPE html>
+                <html>
+                  <head>
+                    <title>Vote Recorded</title>
+                    <meta property="og:title" content="Vote Recorded">
+                    <meta property="og:image" content="${imageUrl}">
+                    <meta name="fc:frame" content="vNext">
+                    <meta name="fc:frame:image" content="${imageUrl}">
+                    <meta name="fc:frame:post_url" content="${process.env['HOST']}/api/quiz/question?quiz_id=${quizId}&questionId=${questionId}">
+                    <meta name="fc:frame:button:1" content="${question.option1}">
+                    <meta name="fc:frame:button:2" content="${question.option2}">
+                    ${question.option3 ? `<meta name="fc:frame:button:3" content="${question.option3}">` : ''}
+                    ${question.option4 ? `<meta name="fc:frame:button:4" content="${question.option4}">` : ''}
+                  </head>
+                  <body>
+                    <p>${question.text}</p>
+                  </body>
+                </html>
+              `);
+            }
+
+            const questions = await getQuestions(quizId);
+            if (!questions || questions.length === 0) {
+                return res.status(404).send('No questions found');
+            }
+            const question = questions[0];
+            // IF questionId, then check if the answer is correct and update the submission entry
+
             console.log(`req query`, req.query)
             console.log(`req body`, req.body)
-            // if (!quizId || !questionId || !answer) {
-            //     return res.status(400).send('Missing quiz data');
-            // }
             // validate message
             let validatedMessage : Message | undefined = undefined;
             try {
@@ -43,29 +87,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 fid = req.body?.untrustedData?.fid || 0;
                 buttonId = req.body?.untrustedData?.buttonIndex || 0;
             }
-
-            console.log(fid, buttonId, quizId, questionId, answer)
-
-            // check if answer is correct
-            // let { data, error } = await supabase.from("question").select("*").eq('id', questionId);
-            // if (error) {
-            //     console.error("Error fetching question", error);
-            //     return res.status(500).send('Error fetching question');
-            // }
-
-            // Create a new submission if none exists
-            // { data, error } = await supabase.from("submission").select("*").eq('fid', fid).eq('quiz_id', quizId);
-            // if (error) {
-            //     console.error("Error fetching submissions", error);
-            //     return res.status(500).send('Error fetching submissions');
-            // }
-            // if (data.length === 0) {
-            //     const { data, error } = await supabase.from("submission").insert([{fid, quiz_id: quizId}]);
-            //     if (error) {
-            //         console.error("Error creating submission", error);
-            //         return res.status(500).send('Error creating submission');
-            //     }
-            // }
         } catch (error) {
             console.error(error);
             res.status(500).send('Error generating image');
