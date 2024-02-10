@@ -1,26 +1,19 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import {Poll, POLL_EXPIRY} from "@/app/types";
-import {kv} from "@vercel/kv";
 import {getSSLHubRpcClient, Message} from "@farcaster/hub-nodejs";
-import { createClient } from "@supabase/supabase-js";
 
 const HUB_URL = process.env['HUB_URL']
 const client = HUB_URL ? getSSLHubRpcClient(HUB_URL) : undefined;
-const supabase = createClient(
-    process.env["SUPABASE_URL"] ?? ``,
-    process.env["SUPABASE_SERVICE_ROLE_KEY"] ?? ``
-  );
   
-
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
     if (req.method === 'POST') {
         try {
             const quizId = req.query['quiz_id']
             const questionId = req.query['question_id']
             const answer = req.body['answer']
-            if (!quizId || !questionId || !answer) {
-                return res.status(400).send('Missing quiz data');
-            }
+            console.log(req)
+            // if (!quizId || !questionId || !answer) {
+            //     return res.status(400).send('Missing quiz data');
+            // }
             // validate message
             let validatedMessage : Message | undefined = undefined;
             try {
