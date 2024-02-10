@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import {getSSLHubRpcClient, Message} from "@farcaster/hub-nodejs";
-import { createSubmission, getQuestions } from '@/helpers';
+import { createSubmission, getQuestion, getQuestions } from '@/helpers';
 import { ISubmission } from '@/app/types/types';
 
 const HUB_URL = process.env['HUB_URL']
@@ -10,7 +10,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     if (req.method === 'POST') {
         try {
             const quizId = req.query['quiz_id'] as string
-            const questionId = req.query['question_id']
+            const questionId = req.query['question_id'] as string
 
             if(!quizId) {
                 return res.status(400).send('Missing quiz_id');
@@ -54,24 +54,24 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             // get next question and update submission entry
             // get questions and find the next question
             try {
-                const questions = await getQuestions(quizId);
-                if (!questions || questions.length === 0) {
-                    return res.status(404).send('No questions found');
-                }
-                const currentQuestion = questions.find(q => q.id === questionId);
-                console.log(`currentQuestion`, currentQuestion)
+                const currentQuestion = await getQuestion(quizId, questionId);
                 if (!currentQuestion) {
                     return res.status(404).send('Question not found');
                 }
 
-                // IF questionId, then check if the answer is correct and update the submission entry
-                // validate message
-
+                // check if answer is correct
+                
                 // update submission entry
-                submission = await createSubmission(quizId, req.body?.untrustedData?.fid || '');
-                console.log(`submission`, submission)
+                
+                
+
                 // get next question
-                const nextQuestion = questions[questions.indexOf(currentQuestion) + 1];
+                if(!currentQuestion.next_question_id) {
+                    // return results
+                }
+                // get next question
+                const nextQuestion = await getQuestion(quizId, currentQuestion.next_question_id);
+                console.log(`nextQuestion`, nextQuestion)
                 if (!nextQuestion) {
                     return res.status(404).send('No more questions found');
                 }

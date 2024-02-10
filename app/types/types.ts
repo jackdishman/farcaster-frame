@@ -22,4 +22,5 @@ export interface IQuestion {
     option_4: string
     answer: number
     explanation: string
+    next_question_id: string
 }
