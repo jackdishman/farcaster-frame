@@ -10,7 +10,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             const quizId = req.query['quiz_id']
             const questionId = req.query['question_id']
             const answer = req.body['answer']
-            console.log(req)
+            console.log(`req query`, req.query)
+            console.log(`req body`, req.body)
             // if (!quizId || !questionId || !answer) {
             //     return res.status(400).send('Missing quiz data');
             // }
@@ -19,7 +20,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             try {
                 const frameMessage = Message.decode(Buffer.from(req.body?.trustedData?.messageBytes || '', 'hex'));
                 const result = await client?.validateMessage(frameMessage);
-                console.log(result)
+                console.log(`validateMessage result` ,result)
                 if (result && result.isOk() && result.value.valid) {
                     validatedMessage = result.value.message;
                 }
