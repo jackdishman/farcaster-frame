@@ -38,10 +38,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                     <meta name="fc:frame" content="vNext">
                     <meta name="fc:frame:image" content="${imageUrl}">
                     <meta name="fc:frame:post_url" content="${process.env['HOST']}/api/quiz/question?quiz_id=${quizId}&questionId=${questionId}">
-                    <meta name="fc:frame:button:1" content="${question.option1}">
-                    <meta name="fc:frame:button:2" content="${question.option2}">
-                    ${question.option3 ? `<meta name="fc:frame:button:3" content="${question.option3}">` : ''}
-                    ${question.option4 ? `<meta name="fc:frame:button:4" content="${question.option4}">` : ''}
+                    <meta name="fc:frame:button:1" content="${question.option_1}">
+                    <meta name="fc:frame:button:2" content="${question.option_2}">
+                    ${question.option_3 ? `<meta name="fc:frame:button:3" content="${question.option_3}">` : ''}
+                    ${question.option_4 ? `<meta name="fc:frame:button:4" content="${question.option_4}">` : ''}
                   </head>
                   <body>
                     <p>${question.text}</p>
