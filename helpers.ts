@@ -51,11 +51,10 @@ export async function getQuestions(quizId: string): Promise<IQuestion[] | undefi
       const { data, error } = await supabase
         .from("submissions")
         .insert([{ quiz_id: quizId, fid, answers: {} }])
-        .select("*")
-        .single();
+        .select()
         console.log(`new submission`, data)
       if (error) throw error;
-      return data as ISubmission;
+      return data[0] as ISubmission;
     } catch (error) {
       console.error("Error creating submission", error);
     }
