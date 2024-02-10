@@ -11,6 +11,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         try {
             const quizId = req.query['quiz_id'] as string
             const questionId = req.query['question_id']
+            console.log(`req query`, req.query)
 
             if(!quizId) {
                 return res.status(400).send('Missing quiz_id');

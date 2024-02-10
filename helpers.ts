@@ -25,7 +25,8 @@ export async function getQuestions(quizId: string): Promise<IQuestion[] | undefi
       const { data, error } = await supabase
         .from("question")
         .select("*")
-        .eq("quiz_id", quizId);
+        .eq("quiz_id", quizId)
+        .order('id', {ascending: true});
       if (error) throw error;
       console.log(data);
       return data as unknown as IQuestion[];
