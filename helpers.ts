@@ -13,7 +13,6 @@ export async function getQuiz(quizId: string): Promise<IQuiz | undefined> {
         .select("*")
         .eq("id", quizId);
       if (error) throw error;
-      console.log(data);
       return data[0] as unknown as IQuiz;
     } catch (error) {
       console.error("Error fetching quizzes", error);
@@ -28,7 +27,6 @@ export async function getQuestions(quizId: string): Promise<IQuestion[] | undefi
         .eq("quiz_id", quizId)
         .order('id', {ascending: true});
       if (error) throw error;
-      console.log(data);
       return data as unknown as IQuestion[];
     } catch (error) {
       console.error("Error fetching questions", error);
@@ -56,8 +54,6 @@ export async function getQuestions(quizId: string): Promise<IQuestion[] | undefi
         .from("submissions")
         .insert([{ quiz_id: quizId, fid }])
         .select()
-        console.log(data);
-
       if (error) throw error;
       return data[0] as ISubmission;
     } catch (error) {

@@ -11,7 +11,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         try {
             const quizId = req.query['quiz_id'] as string
             const questionId = req.query['question_id']
-            console.log(`req query`, req.query)
 
             if(!quizId) {
                 return res.status(400).send('Missing quiz_id');
@@ -60,6 +59,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                     return res.status(404).send('No questions found');
                 }
                 const currentQuestion = questions.find(q => q.id === questionId);
+                console.log(`currentQuestion`, currentQuestion)
                 if (!currentQuestion) {
                     return res.status(404).send('Question not found');
                 }
@@ -69,6 +69,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
                 // update submission entry
                 submission = await createSubmission(quizId, req.body?.untrustedData?.fid || '');
+                console.log(`submission`, submission)
                 // get next question
                 const nextQuestion = questions[questions.indexOf(currentQuestion) + 1];
                 if (!nextQuestion) {
