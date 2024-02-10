@@ -13,3 +13,14 @@ export type Poll = {
 };
 
 export const POLL_EXPIRY = 60 * 60 * 24 * 180; // Expire polls after 3 months
+
+export type Question = {
+  id: string
+  text: string
+  option1: string
+  option2: string
+  option3: string
+  option4: string
+  correctAnswer: number
+  explanation: string
+}
