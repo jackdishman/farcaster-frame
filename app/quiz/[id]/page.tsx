@@ -1,26 +1,6 @@
-import Head from "next/head";
 import { Metadata, ResolvingMetadata } from "next";
-import { createClient } from "@supabase/supabase-js";
 import { IQuiz } from "@/app/types/types";
-
-const supabase = createClient(
-  process.env["SUPABASE_URL"] ?? ``,
-  process.env["SUPABASE_SERVICE_ROLE_KEY"] ?? ``
-);
-
-async function getQuiz(quizId: string): Promise<IQuiz | undefined> {
-  try {
-    const { data, error } = await supabase
-      .from("quiz")
-      .select("*")
-      .eq("id", quizId);
-    if (error) throw error;
-    console.log(data);
-    return data[0] as unknown as IQuiz;
-  } catch (error) {
-    console.error("Error fetching quizzes", error);
-  }
-}
+import { getQuiz } from "@/helpers";
 
 type Props = {
   params: { id: string };
@@ -33,7 +13,17 @@ export async function generateMetadata(
 ): Promise<Metadata> {
   // read route params
   const id = params.id;
-  const quiz: IQuiz = (await getQuiz(id)) as unknown as IQuiz;
+  const quiz: IQuiz | undefined = (await getQuiz(id));
+    if (!quiz) {
+        return {
+        title: "Quiz not found",
+        openGraph: {
+            title: "Quiz not found",
+            description: "Quiz not found",
+        },
+        metadataBase: new URL(process.env["HOST"] || ""),
+        };
+    }
 
   const fcMetadata: Record<string, string> = {
     "fc:frame": "vNext",
@@ -70,6 +60,7 @@ export default async function Page({ params }: { params: { id: string } }) {
       <main className="flex flex-col items-center justify-center flex-1 px-4 sm:px-20 text-center">
         <h1 className="text-2xl">{quiz.title}</h1>
         <p>{quiz.description}</p>
+        <img src={process.env[`HOST`]+`/api/quiz/image?quiz_id=${params.id}`} />
       </main>
     </div>
   );

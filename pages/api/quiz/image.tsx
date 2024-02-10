@@ -1,32 +1,13 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import sharp from 'sharp';
-import {Poll} from "@/app/types";
-import {kv} from "@vercel/kv";
 import satori from "satori";
 import { join } from 'path';
 import * as fs from "fs";
 import { IQuiz } from '@/app/types/types';
-import { createClient } from '@supabase/supabase-js';
+import { getQuiz } from '@/helpers';
 
 const fontPath = join(process.cwd(), 'Roboto-Regular.ttf')
 let fontData = fs.readFileSync(fontPath)
-
-const supabase = createClient(
-    process.env["SUPABASE_URL"] ?? ``,
-    process.env["SUPABASE_SERVICE_ROLE_KEY"] ?? ``
-  );
-
-  async function getQuiz(quizId: string) {
-    try {
-      const { data, error } = await supabase.from("quiz").select("*").eq('id', quizId);
-      if (error) throw error;
-      console.log(data);
-      return data;
-    } catch (error) {
-      console.error("Error fetching quizzes", error);
-    }
-  }
-  
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
     try {
@@ -48,6 +29,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             description: quiz.description,
         };
 
+        console.log(quizData)
+
         const svg = await satori(
             <div style={{
                 justifyContent: 'flex-start',
@@ -65,8 +48,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                     flexDirection: 'column',
                     padding: 20,
                 }}>
-                    <h2 style={{textAlign: 'center', color: '#007bff'}}>{quizData.title}</h2>
-                    <h3 style={{color: "#007bff"}}>{quizData.description}</h3>
+                    <h2 style={{textAlign: 'center', color: '#fff'}}>{quizData.title}</h2>
+                    <h3 style={{color: "#fff"}}>{quizData.description}</h3>
                 </div>
             </div>
             ,
