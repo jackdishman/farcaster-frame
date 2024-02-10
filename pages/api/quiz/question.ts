@@ -20,7 +20,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             let submission:ISubmission | undefined = undefined;
             if(!questionId) {
                 submission = await createSubmission(quizId, req.body?.untrustedData?.fid || '');
-                console.log(`submission`, submission)
                 // get first question
                 const questions = await getQuestions(quizId);
                 if (!questions || questions.length === 0) {
@@ -53,6 +52,56 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             }
 
             // get next question and update submission entry
+            // get questions and find the next question
+            try {
+                const questions = await getQuestions(quizId);
+                if (!questions || questions.length === 0) {
+                    return res.status(404).send('No questions found');
+                }
+                const currentQuestion = questions.find(q => q.id === questionId);
+                if (!currentQuestion) {
+                    return res.status(404).send('Question not found');
+                }
+
+                // IF questionId, then check if the answer is correct and update the submission entry
+                // validate message
+
+                // update submission entry
+                submission = await createSubmission(quizId, req.body?.untrustedData?.fid || '');
+                // get next question
+                const nextQuestion = questions[questions.indexOf(currentQuestion) + 1];
+                if (!nextQuestion) {
+                    return res.status(404).send('No more questions found');
+                }
+                const imageUrl = `${process.env['HOST']}/api/quiz/image-question?text=${nextQuestion.text}`;
+                res.setHeader('Content-Type', 'text/html');
+                res.status(200).send(`
+                <!DOCTYPE html>
+                <html>
+                  <head>
+                    <title>Vote Recorded</title>
+                    <meta property="og:title" content="Vote Recorded">
+                    <meta property="og:image" content="${imageUrl}">
+                    <meta name="fc:frame" content="vNext">
+                    <meta name="fc:frame:image" content="${imageUrl}">
+                    <meta name="fc:frame:post_url" content="${process.env['HOST']}/api/quiz/question?quiz_id=${quizId}&question_id=${nextQuestion.id}">
+                    <meta name="fc:frame:button:1" content="${nextQuestion.option_1}">
+                    <meta name="fc:frame:button:2" content="${nextQuestion.option_2}">
+                    ${nextQuestion.option_3 ? `<meta name="fc:frame:button:3" content="${nextQuestion.option_3}">` : ''}
+                    ${nextQuestion.option_4 ? `<meta name="fc:frame:button:4" content="${nextQuestion.option_4}">` : ''}
+                  </head>
+                  <body>
+                    <p>${nextQuestion.text}</p>
+                  </body>
+                </html>
+              `);
+              return;
+            }
+            catch (error) {
+                console.error(error);
+                res.status(500).send('Error generating image');
+            }
+            
 
             const questions = await getQuestions(quizId);
             if (!questions || questions.length === 0) {
