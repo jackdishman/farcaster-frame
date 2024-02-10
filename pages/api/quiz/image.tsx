@@ -65,8 +65,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                     flexDirection: 'column',
                     padding: 20,
                 }}>
-                    <h2 style={{textAlign: 'center', color: 'lightgray'}}>{quizData.title}</h2>
-                    <h3 style={{color: "darkgray"}}>{quizData.description}</h3>
+                    <h2 style={{textAlign: 'center', color: '#007bff'}}>{quizData.title}</h2>
+                    <h3 style={{color: "#007bff"}}>{quizData.description}</h3>
                 </div>
             </div>
             ,
