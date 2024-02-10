@@ -41,16 +41,21 @@ export async function getQuestions(quizId: string): Promise<IQuestion[] | undefi
         .from("submissions")
         .select("*")
         .eq("quiz_id", quizId)
-        .eq("fid", fid).single();
+        .eq("fid", fid)
+        .single();
+        console.log(`existingSubmission`, existingSubmission)
       if (existingSubmissionError) throw existingSubmissionError;
-      if (existingSubmission && existingSubmission.length > 0) {
-        return existingSubmission[0] as unknown as ISubmission;
+      if (existingSubmission) {
+        return existingSubmission as ISubmission;
       }
       const { data, error } = await supabase
-        .from("submission")
-        .insert([{ quiz_id: quizId, fid, answers: {} }]).select("*").single();
-      if (error) throw error;;
-      return data[0] as unknown as ISubmission;
+        .from("submissions")
+        .insert([{ quiz_id: quizId, fid, answers: {} }])
+        .select("*")
+        .single();
+        console.log(`new submission`, data)
+      if (error) throw error;
+      return data as ISubmission;
     } catch (error) {
       console.error("Error creating submission", error);
     }
