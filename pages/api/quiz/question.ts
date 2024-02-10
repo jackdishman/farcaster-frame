@@ -19,8 +19,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             // IF no questionId, then send the first question and create a new submission entry (if does not exist)
             let submission:ISubmission | undefined = undefined;
             if(!questionId) {
-                console.log(`quizId`, quizId)
-                console.log(`fid`, req.body?.untrustedData?.fid || '')
                 submission = await createSubmission(quizId, req.body?.untrustedData?.fid || '');
                 console.log(`submission`, submission)
                 // get first question
@@ -40,7 +38,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                     <meta property="og:image" content="${imageUrl}">
                     <meta name="fc:frame" content="vNext">
                     <meta name="fc:frame:image" content="${imageUrl}">
-                    <meta name="fc:frame:post_url" content="${process.env['HOST']}/api/quiz/question?quiz_id=${quizId}&question_id=${questionId}">
+                    <meta name="fc:frame:post_url" content="${process.env['HOST']}/api/quiz/question?quiz_id=${quizId}&question_id=${question.id}">
                     <meta name="fc:frame:button:1" content="${question.option_1}">
                     <meta name="fc:frame:button:2" content="${question.option_2}">
                     ${question.option_3 ? `<meta name="fc:frame:button:3" content="${question.option_3}">` : ''}
@@ -55,7 +53,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             }
 
             // get next question and update submission entry
-            console.log(`req query`, req.query)
 
             const questions = await getQuestions(quizId);
             if (!questions || questions.length === 0) {
