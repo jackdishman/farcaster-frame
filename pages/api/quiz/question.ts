@@ -48,7 +48,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                   </body>
                 </html>
               `);
+              return;
             }
+
+            // get next question and update submission entry
+            console.log(`req query`, req.query)
 
             const questions = await getQuestions(quizId);
             if (!questions || questions.length === 0) {

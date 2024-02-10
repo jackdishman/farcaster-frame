@@ -38,7 +38,7 @@ export async function getQuestions(quizId: string): Promise<IQuestion[] | undefi
     try {
       // check if exists first
       const { data: existingSubmission, error: existingSubmissionError } = await supabase
-        .from("submission")
+        .from("submissions")
         .select("*")
         .eq("quiz_id", quizId)
         .eq("fid", fid).single();
