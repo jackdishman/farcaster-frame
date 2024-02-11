@@ -1,6 +1,11 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { getSSLHubRpcClient, Message } from "@farcaster/hub-nodejs";
-import { createSubmission, getQuestion, getQuestions } from "@/helpers";
+import {
+  createSubmission,
+  getQuestion,
+  getQuestions,
+  updateSubmission,
+} from "@/helpers";
 import { ISubmission } from "@/app/types/types";
 
 const HUB_URL = process.env["HUB_URL"];
@@ -15,17 +20,57 @@ export default async function handler(
       const quizId = req.query["quiz_id"] as string;
       const questionId = req.query["question_id"] as string;
 
+      // validate message
+      let validatedMessage: Message | undefined = undefined;
+      try {
+        const frameMessage = Message.decode(
+          Buffer.from(req.body?.trustedData?.messageBytes || "", "hex")
+        );
+        const result = await client?.validateMessage(frameMessage);
+        if (result && result.isOk() && result.value.valid) {
+          validatedMessage = result.value.message;
+        }
+        // Also validate the frame url matches the expected url
+        let urlBuffer = validatedMessage?.data?.frameActionBody?.url || [];
+        const urlString = Buffer.from(urlBuffer).toString("utf-8");
+        if (
+          validatedMessage &&
+          !urlString.startsWith(process.env["HOST"] || "")
+        ) {
+          return res.status(400).send(`Invalid frame url: ${urlBuffer}`);
+        }
+      } catch (e) {
+        return res.status(400).send(`Failed to validate message: ${e}`);
+      }
+
+      // If HUB_URL is not provided, don't validate and fall back to untrusted data
+      let fid = 0,
+        buttonId = 0,
+        inputText = "";
+      if (client) {
+        buttonId = validatedMessage?.data?.frameActionBody?.buttonIndex || 0;
+        fid = validatedMessage?.data?.fid || 0;
+        inputText = Buffer.from(
+          validatedMessage?.data?.frameActionBody?.inputText || []
+        ).toString("utf-8");
+      } else {
+        fid = req.body?.untrustedData?.fid || 0;
+        buttonId = req.body?.untrustedData?.buttonIndex || 0;
+        inputText = req.body?.untrustedData?.inputText || "";
+      }
+      console.log(`fid`, fid);
+      console.log(`input text`, inputText);
+
       if (!quizId) {
         return res.status(400).send("Missing quiz_id");
       }
 
       // IF no questionId, then send the first question and create a new submission entry (if does not exist)
-      let submission: ISubmission | undefined = undefined;
+      let submission: ISubmission | undefined = await createSubmission(
+        quizId,
+        req.body?.untrustedData?.fid || ""
+      );
       if (!questionId) {
-        submission = await createSubmission(
-          quizId,
-          req.body?.untrustedData?.fid || ""
-        );
         // get first question
         const questions = await getQuestions(quizId);
         if (!questions || questions.length === 0) {
@@ -73,47 +118,6 @@ export default async function handler(
         return;
       }
 
-      // validate message
-      let validatedMessage: Message | undefined = undefined;
-      try {
-        const frameMessage = Message.decode(
-          Buffer.from(req.body?.trustedData?.messageBytes || "", "hex")
-        );
-        const result = await client?.validateMessage(frameMessage);
-        if (result && result.isOk() && result.value.valid) {
-          validatedMessage = result.value.message;
-        }
-        // Also validate the frame url matches the expected url
-        let urlBuffer = validatedMessage?.data?.frameActionBody?.url || [];
-        const urlString = Buffer.from(urlBuffer).toString("utf-8");
-        if (
-          validatedMessage &&
-          !urlString.startsWith(process.env["HOST"] || "")
-        ) {
-          return res.status(400).send(`Invalid frame url: ${urlBuffer}`);
-        }
-      } catch (e) {
-        return res.status(400).send(`Failed to validate message: ${e}`);
-      }
-
-      // If HUB_URL is not provided, don't validate and fall back to untrusted data
-      let fid = 0,
-        buttonId = 0,
-        inputText = "";
-      if (client) {
-        buttonId = validatedMessage?.data?.frameActionBody?.buttonIndex || 0;
-        fid = validatedMessage?.data?.fid || 0;
-        inputText = Buffer.from(
-          validatedMessage?.data?.frameActionBody?.inputText || []
-        ).toString("utf-8");
-      } else {
-        fid = req.body?.untrustedData?.fid || 0;
-        buttonId = req.body?.untrustedData?.buttonIndex || 0;
-        inputText = req.body?.untrustedData?.inputText || "";
-      }
-      console.log(`fid`, fid);
-      console.log(`input text`, inputText);
-
       //   get question
       const currentQuestion = await getQuestion(quizId, questionId);
       if (!currentQuestion) {
@@ -136,6 +140,21 @@ export default async function handler(
 
       // update submission entry
       console.log(`isCorrect`, isCorrect);
+      try {
+        if (!submission) {
+          throw new Error("Submission not found");
+        }
+        submission = await updateSubmission(
+          fid.toString(),
+          submission,
+          questionId,
+          inputText,
+          isCorrect
+        );
+      } catch (error) {
+        console.error("Error updating submission", error);
+        return res.status(500).send("Error updating submission");
+      }
 
       // IF no next_question_id, then return the results
       if (!currentQuestion.next_question_id) {

@@ -6,11 +6,17 @@ export interface IQuiz {
 }
 
 export interface ISubmission {
-    answers: {} | null
+    answers: IAnswerEntry[] | null
     created_at: string
     id: number
     quiz_id: number | null
     fid: string | null
+}
+
+export interface IAnswerEntry {
+    question_id: string
+    answer: string
+    isCorrect: boolean
 }
 
 export interface IQuestion {

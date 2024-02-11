@@ -1,5 +1,5 @@
 import { createClient } from "@supabase/supabase-js";
-import { IQuestion, IQuiz, ISubmission } from "./app/types/types";
+import { IAnswerEntry, IQuestion, IQuiz, ISubmission } from "./app/types/types";
 
 const supabase = createClient(
     process.env["SUPABASE_URL"] ?? ``,
@@ -75,5 +75,26 @@ export async function getQuestions(quizId: string): Promise<IQuestion[] | undefi
       return data[0] as unknown as IQuestion;
     } catch (error) {
       console.error("Error fetching question", error);
+    }
+  }
+
+  export async function updateSubmission(fid: string, submissionState:ISubmission, questionId: string, answer: string, isCorrect:boolean): Promise<ISubmission | undefined> {
+    const answerEntry: IAnswerEntry = {
+      question_id: questionId,
+      answer,
+      isCorrect
+    }
+    const answers = submissionState.answers ? [...submissionState.answers, answerEntry] : [answerEntry];
+    try {
+      const { data, error } = await supabase
+        .from("submissions")
+        .update({answers})
+        .eq("id", submissionState.id)
+        .eq("fid", fid)
+        .select();
+      if (error) throw error;
+      return data[0] as ISubmission;
+    } catch (error) {
+      console.error("Error updating submission", error);
     }
   }
