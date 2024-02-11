@@ -68,7 +68,7 @@ export default async function handler(
       // IF no questionId, then send the first question and create a new submission entry (if does not exist)
       let submission: ISubmission | undefined = await createSubmission(
         quizId,
-        req.body?.untrustedData?.fid || ""
+        fid.toString() || ""
       );
       if (!questionId) {
         // get first question
