@@ -221,7 +221,7 @@ export default async function handler(
             submission.answers.length) *
             100
         );
-        const imageUrl = `${process.env["HOST"]}/api/quiz/image-result?text=${"You scored" + percentage + "%"}`;
+        const imageUrl = `${process.env["HOST"]}/api/quiz/image-question?text=${"You scored" + percentage + "%"}`;
         res.setHeader("Content-Type", "text/html");
         res.status(200).send(`
                 <!DOCTYPE html>
