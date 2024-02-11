@@ -213,6 +213,37 @@ export default async function handler(
       // IF no next_question_id, then return the results
       if (!currentQuestion.next_question_id) {
         // TODO: return results
+        // calculate percentage correct
+        if(!submission || !submission.answers || submission.answers.length === 0) {
+            throw new Error("Submission not found");
+        }
+        const percentage = Math.round(
+          (submission.answers.filter((answer) => answer.isCorrect).length /
+            submission.answers.length) *
+            100
+        );
+        const imageUrl = `${process.env["HOST"]}/api/quiz/image-result?text=${"You scored" + percentage + "%"}`;
+        res.setHeader("Content-Type", "text/html");
+        res.status(200).send(`
+                <!DOCTYPE html>
+                <html>
+                  <head>
+                    <title>Vote Recorded</title>
+                    <meta property="og:title" content="Vote Recorded">
+                    <meta property="og:image" content="${imageUrl}">
+                    <meta name="fc:frame" content="vNext">
+                    <meta name="fc:frame:image" content="${imageUrl}">
+                    <meta name="fc:frame:post_url" content="${
+                      process.env["HOST"]
+                    }/api/quiz/question?quiz_id=${quizId}&show_results=true">
+        }">
+                    <meta name="fc:frame:button:1" content="Done">
+                  </head>
+                  <body>
+                    <p>You scored ${percentage}%</p>
+                  </body>
+                </html>
+              `);
         return res.status(200).send("No more questions found");
       }
 
