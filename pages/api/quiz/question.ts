@@ -6,10 +6,51 @@ import {
   getQuestions,
   updateSubmission,
 } from "@/helpers";
-import { ISubmission } from "@/app/types/types";
+import { ISubmission, IQuestion } from "@/app/types/types";
 
 const HUB_URL = process.env["HUB_URL"];
 const client = HUB_URL ? getSSLHubRpcClient(HUB_URL) : undefined;
+
+
+async function checkPreviouslyAnswered(submission: ISubmission, questionId: string, res: NextApiResponse, question: IQuestion) {
+    if (submission.answers && submission.answers.length > 0) {
+        const answeredQuestionIds = submission.answers.map(
+        (answer) => answer.question_id
+        );
+        if (answeredQuestionIds.includes(questionId)) {
+        // If they have answered this question, return the result
+        submission.answers.forEach((answer) => {
+            if (answer.question_id === questionId) {
+                const imageUrl = `${process.env["HOST"]}/api/quiz/image-result?explanation=${question.explanation}&correct=${answer.isCorrect}`;
+                res.setHeader("Content-Type", "text/html");
+                res.status(200).send(`
+                        <!DOCTYPE html>
+                        <html>
+                          <head>
+                            <title>Vote Recorded</title>
+                            <meta property="og:title" content="Vote Recorded">
+                            <meta property="og:image" content="${imageUrl}">
+                            <meta name="fc:frame" content="vNext">
+                            <meta name="fc:frame:image" content="${imageUrl}">
+                            <meta name="fc:frame:post_url" content="${
+                              process.env["HOST"]
+                            }/api/quiz/question?quiz_id=${submission.quiz_id}&question_id=${
+                  question.next_question_id
+                }">
+                            <meta name="fc:frame:button:1" content="Next Question">
+                          </head>
+                          <body>
+                            <p>${question.text}</p>
+                          </body>
+                        </html>
+                      `);
+        
+            return answer;
+            }
+          });
+        }
+    }
+}
 
 export default async function handler(
   req: NextApiRequest,
@@ -70,7 +111,8 @@ export default async function handler(
         quizId,
         fid.toString() || ""
       );
-      if (!questionId) {
+
+    if (!questionId) {
         // get first question
         const questions = await getQuestions(quizId);
         if (!questions || questions.length === 0) {
@@ -124,6 +166,18 @@ export default async function handler(
         return res.status(404).send("Question not found");
       }
 
+        //   check if question has been answered
+        try {
+          if(!submission) {
+            throw new Error("Submission not found");
+          }
+            await checkPreviouslyAnswered(submission, questionId, res, currentQuestion);
+        }
+        catch (error) {
+            console.error(error);
+            res.status(500).send("Error checking previously answered");
+        }
+
       // check if answer is correct
       let isCorrect = false;
       //   handle multiple choice
@@ -164,7 +218,6 @@ export default async function handler(
 
       // send next question
       try {
-        // get next question
         const nextQuestion = await getQuestion(
           quizId,
           currentQuestion.next_question_id
