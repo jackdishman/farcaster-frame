@@ -79,12 +79,9 @@ export default async function handler(
         const frameMessage = Message.decode(
           Buffer.from(req.body?.trustedData?.messageBytes || "", "hex")
         );
-        console.log(`client`, client)
         const result = await client?.validateMessage(frameMessage);
-        console.log(`validateMessage result`, result);
         if (result && result.isOk() && result.value.valid) {
           validatedMessage = result.value.message;
-          console.log(`validatedMessage`, validatedMessage)
         }
         // Also validate the frame url matches the expected url
         let urlBuffer = validatedMessage?.data?.frameActionBody?.url || [];
@@ -101,15 +98,21 @@ export default async function handler(
 
       // If HUB_URL is not provided, don't validate and fall back to untrusted data
       let fid = 0,
-        buttonId = 0;
+        buttonId = 0,
+        inputText = "";
       if (client) {
         buttonId = validatedMessage?.data?.frameActionBody?.buttonIndex || 0;
         fid = validatedMessage?.data?.fid || 0;
+        inputText = Buffer.from(
+          validatedMessage?.data?.frameActionBody?.inputText || []
+        ).toString("utf-8");
       } else {
         fid = req.body?.untrustedData?.fid || 0;
         buttonId = req.body?.untrustedData?.buttonIndex || 0;
+        inputText = req.body?.untrustedData?.inputText || "";
       }
       console.log(`fid`, fid);
+      console.log(`input text`, inputText);
 
       //   get question
       const currentQuestion = await getQuestion(quizId, questionId);
@@ -118,12 +121,21 @@ export default async function handler(
       }
 
       // check if answer is correct
-      const answer = req.body?.untrustedData?.buttonIndex || 0;
-      const isCorrect = answer === currentQuestion.answer;
-      console.log(`answer`, answer);
-      console.log(`isCorrect`, isCorrect);
+      let isCorrect = false;
+      //   handle multiple choice
+      if (currentQuestion.answer === `option_${buttonId}`) {
+        isCorrect = true;
+      }
+      // handle text input
+      if (
+        currentQuestion.answer.toUpperCase().trim() ===
+        inputText.toUpperCase().trim()
+      ) {
+        isCorrect = true;
+      }
 
       // update submission entry
+      console.log(`isCorrect`, isCorrect);
 
       // IF no next_question_id, then return the results
       if (!currentQuestion.next_question_id) {

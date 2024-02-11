@@ -20,7 +20,7 @@ export interface IQuestion {
     option_2: string
     option_3: string
     option_4: string
-    answer: number
+    answer: string
     explanation: string
     next_question_id: string
 }
