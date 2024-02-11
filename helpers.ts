@@ -98,3 +98,17 @@ export async function getQuestions(quizId: string): Promise<IQuestion[] | undefi
       console.error("Error updating submission", error);
     }
   }
+
+  export async function updateSubmissionScore(submissionId: number, score: number): Promise<ISubmission | undefined> {
+    try {
+      const { data, error } = await supabase
+        .from("submissions")
+        .update({score})
+        .eq("id", submissionId)
+        .select();
+      if (error) throw error;
+      return data[0] as ISubmission;
+    } catch (error) {
+      console.error("Error updating submission", error);
+    }
+  }

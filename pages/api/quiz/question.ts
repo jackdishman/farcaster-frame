@@ -5,11 +5,37 @@ import {
   getQuestion,
   getQuestions,
   updateSubmission,
+  updateSubmissionScore,
 } from "@/helpers";
 import { ISubmission, IQuestion } from "@/app/types/types";
 
 const HUB_URL = process.env["HUB_URL"];
 const client = HUB_URL ? getSSLHubRpcClient(HUB_URL) : undefined;
+
+async function sendResults(res: NextApiResponse, percentage: number, quizId: string) {
+  const imageUrl = `${process.env["HOST"]}/api/quiz/image-question?text=${"You scored " + percentage + " percent correct"}`;
+  res.setHeader("Content-Type", "text/html");
+  res.status(200).send(`
+          <!DOCTYPE html>
+          <html>
+            <head>
+              <title>Vote Recorded</title>
+              <meta property="og:title" content="Vote Recorded">
+              <meta property="og:image" content="${imageUrl}">
+              <meta name="fc:frame" content="vNext">
+              <meta name="fc:frame:image" content="${imageUrl}">
+              <meta name="fc:frame:post_url" content="${
+                process.env["HOST"]
+              }/api/quiz/question?quiz_id=${quizId}&show_results=true">
+  }">
+              <meta name="fc:frame:button:1" content="Done">
+            </head>
+            <body>
+              <p>You scored ${percentage}%</p>
+            </body>
+          </html>
+        `);
+}
 
 
 async function checkPreviouslyAnswered(submission: ISubmission, questionId: string, res: NextApiResponse, question: IQuestion) {
@@ -111,6 +137,12 @@ export default async function handler(
         quizId,
         fid.toString() || ""
       );
+
+      // if already completed, return results
+      if(submission && submission.score) {
+        sendResults(res, submission.score, quizId);
+        return;
+      }
 
     if (!questionId) {
         // get first question
@@ -221,28 +253,14 @@ export default async function handler(
             submission.answers.length) *
             100
         );
-        const imageUrl = `${process.env["HOST"]}/api/quiz/image-question?text=${"You scored" + percentage + "%"}`;
-        res.setHeader("Content-Type", "text/html");
-        res.status(200).send(`
-                <!DOCTYPE html>
-                <html>
-                  <head>
-                    <title>Vote Recorded</title>
-                    <meta property="og:title" content="Vote Recorded">
-                    <meta property="og:image" content="${imageUrl}">
-                    <meta name="fc:frame" content="vNext">
-                    <meta name="fc:frame:image" content="${imageUrl}">
-                    <meta name="fc:frame:post_url" content="${
-                      process.env["HOST"]
-                    }/api/quiz/question?quiz_id=${quizId}&show_results=true">
-        }">
-                    <meta name="fc:frame:button:1" content="Done">
-                  </head>
-                  <body>
-                    <p>You scored ${percentage}%</p>
-                  </body>
-                </html>
-              `);
+        // update submission score with percentage
+        try {
+          submission = await updateSubmissionScore(submission.id, percentage);
+        } catch (error) {
+          console.error("Error updating submission score", error);
+          return res.status(500).send("Error updating submission score");
+        }
+        sendResults(res, percentage, quizId);
         return
       }
 
