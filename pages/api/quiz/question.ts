@@ -212,7 +212,6 @@ export default async function handler(
 
       // IF no next_question_id, then return the results
       if (!currentQuestion.next_question_id) {
-        // TODO: return results
         // calculate percentage correct
         if(!submission || !submission.answers || submission.answers.length === 0) {
             throw new Error("Submission not found");
@@ -244,7 +243,7 @@ export default async function handler(
                   </body>
                 </html>
               `);
-        return res.status(200).send("No more questions found");
+        return
       }
 
       // send next question
