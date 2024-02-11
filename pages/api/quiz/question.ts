@@ -79,7 +79,6 @@ export default async function handler(
         const frameMessage = Message.decode(
           Buffer.from(req.body?.trustedData?.messageBytes || "", "hex")
         );
-        console.log(`frameMessage`, frameMessage)
         const result = await client?.validateMessage(frameMessage);
         console.log(`validateMessage result`, result);
         if (result && result.isOk() && result.value.valid) {
