@@ -74,42 +74,42 @@ export default async function handler(
       }
 
       // validate message
-    //   let validatedMessage: Message | undefined = undefined;
-    //   try {
-    //     const frameMessage = Message.decode(
-    //       Buffer.from(req.body?.trustedData?.messageBytes || "", "hex")
-    //     );
-    //     console.log(`frameMessage`, frameMessage)
-    //     const result = await client?.validateMessage(frameMessage);
-    //     console.log(`validateMessage result`, result);
-    //     if (result && result.isOk() && result.value.valid) {
-    //       validatedMessage = result.value.message;
-    //       console.log(`validatedMessage`, validatedMessage)
-    //     }
-    //     // Also validate the frame url matches the expected url
-    //     let urlBuffer = validatedMessage?.data?.frameActionBody?.url || [];
-    //     const urlString = Buffer.from(urlBuffer).toString("utf-8");
-    //     if (
-    //       validatedMessage &&
-    //       !urlString.startsWith(process.env["HOST"] || "")
-    //     ) {
-    //       return res.status(400).send(`Invalid frame url: ${urlBuffer}`);
-    //     }
-    //   } catch (e) {
-    //     return res.status(400).send(`Failed to validate message: ${e}`);
-    //   }
+      let validatedMessage: Message | undefined = undefined;
+      try {
+        const frameMessage = Message.decode(
+          Buffer.from(req.body?.trustedData?.messageBytes || "", "hex")
+        );
+        console.log(`client`, client)
+        const result = await client?.validateMessage(frameMessage);
+        console.log(`validateMessage result`, result);
+        if (result && result.isOk() && result.value.valid) {
+          validatedMessage = result.value.message;
+          console.log(`validatedMessage`, validatedMessage)
+        }
+        // Also validate the frame url matches the expected url
+        let urlBuffer = validatedMessage?.data?.frameActionBody?.url || [];
+        const urlString = Buffer.from(urlBuffer).toString("utf-8");
+        if (
+          validatedMessage &&
+          !urlString.startsWith(process.env["HOST"] || "")
+        ) {
+          return res.status(400).send(`Invalid frame url: ${urlBuffer}`);
+        }
+      } catch (e) {
+        return res.status(400).send(`Failed to validate message: ${e}`);
+      }
 
-    //   // If HUB_URL is not provided, don't validate and fall back to untrusted data
-    //   let fid = 0,
-    //     buttonId = 0;
-    //   if (client) {
-    //     buttonId = validatedMessage?.data?.frameActionBody?.buttonIndex || 0;
-    //     fid = validatedMessage?.data?.fid || 0;
-    //   } else {
-    //     fid = req.body?.untrustedData?.fid || 0;
-    //     buttonId = req.body?.untrustedData?.buttonIndex || 0;
-    //   }
-    //   console.log(`fid`, fid);
+      // If HUB_URL is not provided, don't validate and fall back to untrusted data
+      let fid = 0,
+        buttonId = 0;
+      if (client) {
+        buttonId = validatedMessage?.data?.frameActionBody?.buttonIndex || 0;
+        fid = validatedMessage?.data?.fid || 0;
+      } else {
+        fid = req.body?.untrustedData?.fid || 0;
+        buttonId = req.body?.untrustedData?.buttonIndex || 0;
+      }
+      console.log(`fid`, fid);
 
       //   get question
       const currentQuestion = await getQuestion(quizId, questionId);
