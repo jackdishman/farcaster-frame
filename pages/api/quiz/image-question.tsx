@@ -10,6 +10,7 @@ let fontData = fs.readFileSync(fontPath)
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
     try {
         const text = req.query['text']
+        const time = req.query['time']
 
         const svg = await satori(
             <div style={{
@@ -23,6 +24,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 lineHeight: 1.2,
                 fontSize: 24,
             }}>
+                <p>{time}</p>
                 <div style={{
                     display: 'flex',
                     flexDirection: 'column',

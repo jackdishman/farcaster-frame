@@ -4,7 +4,7 @@ import satori from "satori";
 import { join } from 'path';
 import * as fs from "fs";
 import { IQuiz } from '@/app/types/types';
-import { getQuiz } from '@/middleware/helpers';
+import { getQuiz } from '@/middleware/supabase';
 
 const fontPath = join(process.cwd(), 'Roboto-Regular.ttf')
 let fontData = fs.readFileSync(fontPath)

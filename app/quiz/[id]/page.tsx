@@ -1,6 +1,6 @@
 import { Metadata, ResolvingMetadata } from "next";
 import { IQuiz } from "@/app/types/types";
-import { getQuiz } from "@/middleware/helpers";
+import { getQuiz } from "@/middleware/supabase";
 
 type Props = {
   params: { id: string };

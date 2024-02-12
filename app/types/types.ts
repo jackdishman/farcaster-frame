@@ -12,6 +12,7 @@ export interface ISubmission {
     quiz_id: number | null
     fid: string | null
     score: number | null
+    time_completed: string | null
 }
 
 export interface IAnswerEntry {

@@ -1,20 +1,26 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import { getSSLHubRpcClient, Message } from "@farcaster/hub-nodejs";
+import { getSSLHubRpcClient } from "@farcaster/hub-nodejs";
 import {
   createSubmission,
   getQuestion,
   getQuestions,
-  updateSubmission,
   updateSubmissionScore,
-} from "@/middleware/helpers";
+} from "@/middleware/supabase";
 import { ISubmission, IQuestion } from "@/app/types/types";
 import { validateMessage } from "@/middleware/farcaster";
+import { getElapsedTimeString } from "@/middleware/helpers";
 
 const HUB_URL = process.env["HUB_URL"];
 const client = HUB_URL ? getSSLHubRpcClient(HUB_URL) : undefined;
 
-async function sendResults(res: NextApiResponse, percentage: number, quizId: string) {
-  const imageUrl = `${process.env["HOST"]}/api/quiz/image-question?text=${"You scored " + percentage + " percent correct"}`;
+async function sendResults(
+  res: NextApiResponse,
+  percentage: number,
+  quizId: string
+) {
+  const imageUrl = `${process.env["HOST"]}/api/quiz/image-question?text=${
+    "You scored " + percentage + " percent correct"
+  }`;
   res.setHeader("Content-Type", "text/html");
   res.status(200).send(`
           <!DOCTYPE html>
@@ -25,9 +31,7 @@ async function sendResults(res: NextApiResponse, percentage: number, quizId: str
               <meta property="og:image" content="${imageUrl}">
               <meta name="fc:frame" content="vNext">
               <meta name="fc:frame:image" content="${imageUrl}">
-              <meta name="fc:frame:post_url" content="${
-                process.env["HOST"]
-              }/api/quiz/question?quiz_id=${quizId}&show_results=true">
+              <meta name="fc:frame:post_url" content="${process.env["HOST"]}/api/quiz/question?quiz_id=${quizId}&show_results=true">
   }">
               <meta name="fc:frame:button:1" content="Done">
             </head>
@@ -38,19 +42,23 @@ async function sendResults(res: NextApiResponse, percentage: number, quizId: str
         `);
 }
 
-
-async function checkPreviouslyAnswered(submission: ISubmission, questionId: string, res: NextApiResponse, question: IQuestion) {
-    if (submission.answers && submission.answers.length > 0) {
-        const answeredQuestionIds = submission.answers.map(
-        (answer) => answer.question_id
-        );
-        if (answeredQuestionIds.includes(questionId)) {
-        // If they have answered this question, return the result
-        submission.answers.forEach((answer) => {
-            if (answer.question_id === questionId) {
-                const imageUrl = `${process.env["HOST"]}/api/quiz/image-result?explanation=${question.explanation}&correct=${answer.isCorrect}`;
-                res.setHeader("Content-Type", "text/html");
-                res.status(200).send(`
+async function checkPreviouslyAnswered(
+  submission: ISubmission,
+  questionId: string,
+  res: NextApiResponse,
+  question: IQuestion
+) {
+  if (submission.answers && submission.answers.length > 0) {
+    const answeredQuestionIds = submission.answers.map(
+      (answer) => answer.question_id
+    );
+    if (answeredQuestionIds.includes(questionId)) {
+      // If they have answered this question, return the result
+      submission.answers.forEach((answer) => {
+        if (answer.question_id === questionId) {
+          const imageUrl = `${process.env["HOST"]}/api/quiz/image-result?explanation=${question.explanation}&correct=${answer.isCorrect}`;
+          res.setHeader("Content-Type", "text/html");
+          res.status(200).send(`
                         <!DOCTYPE html>
                         <html>
                           <head>
@@ -59,11 +67,7 @@ async function checkPreviouslyAnswered(submission: ISubmission, questionId: stri
                             <meta property="og:image" content="${imageUrl}">
                             <meta name="fc:frame" content="vNext">
                             <meta name="fc:frame:image" content="${imageUrl}">
-                            <meta name="fc:frame:post_url" content="${
-                              process.env["HOST"]
-                            }/api/quiz/question?quiz_id=${submission.quiz_id}&question_id=${
-                  question.next_question_id
-                }">
+                            <meta name="fc:frame:post_url" content="${process.env["HOST"]}/api/quiz/question?quiz_id=${submission.quiz_id}&question_id=${question.next_question_id}">
                             <meta name="fc:frame:button:1" content="Next Question">
                           </head>
                           <body>
@@ -71,12 +75,12 @@ async function checkPreviouslyAnswered(submission: ISubmission, questionId: stri
                           </body>
                         </html>
                       `);
-        
-            return answer;
-            }
-          });
+
+          return answer;
         }
+      });
     }
+  }
 }
 
 export default async function handler(
@@ -101,8 +105,12 @@ export default async function handler(
         fid.toString() || ""
       );
 
+      if (!submission) {
+        return res.status(404).send("Question not found");
+      }
+
       // if already completed, return results
-      if(submission && submission.score) {
+      if (submission && submission.score) {
         sendResults(res, submission.score, quizId);
         return;
       }
@@ -111,7 +119,7 @@ export default async function handler(
       if (!questions || questions.length === 0) {
         return res.status(404).send("No questions found");
       }
-  
+
       let question: IQuestion | undefined;
       if (!questionId) {
         // get first question
@@ -124,22 +132,19 @@ export default async function handler(
         }
       }
 
-        //   check if question has been answered
-        try {
-          if(!submission) {
-            throw new Error("Submission not found");
-          }
-            await checkPreviouslyAnswered(submission, questionId, res, question);
-        }
-        catch (error) {
-            console.error(error);
-            res.status(500).send("Error checking previously answered");
-        }
+      //   check if question has been answered
+      try {
+        await checkPreviouslyAnswered(submission, questionId, res, question);
+      } catch (error) {
+        console.error(error);
+        res.status(500).send("Error checking previously answered");
+      }
 
-        // send question
-        const imageUrl = `${process.env["HOST"]}/api/quiz/image-question?text=${question.text}`;
-        res.setHeader("Content-Type", "text/html");
-        res.status(200).send(`
+      const elapsedTime = getElapsedTimeString(submission.created_at);
+      // send question
+      const imageUrl = `${process.env["HOST"]}/api/quiz/image-question?text=${question.text}&time=${elapsedTime}`;
+      res.setHeader("Content-Type", "text/html");
+      res.status(200).send(`
                 <!DOCTYPE html>
                 <html>
                   <head>
@@ -151,8 +156,8 @@ export default async function handler(
                     <meta name="fc:frame:post_url" content="${
                       process.env["HOST"]
                     }/api/quiz/answer?quiz_id=${quizId}&question_id=${
-          question.id
-        }">
+        question.id
+      }">
                     <meta name="fc:frame:button:1" content="${
                       question.option_1
                     }">
@@ -176,12 +181,15 @@ export default async function handler(
                 </html>
               `);
 
-
       // IF no next_question_id, then return the results
       if (!question.next_question_id) {
         // calculate percentage correct
-        if(!submission || !submission.answers || submission.answers.length === 0) {
-            throw new Error("Submission not found");
+        if (
+          !submission ||
+          !submission.answers ||
+          submission.answers.length === 0
+        ) {
+          throw new Error("Submission not found");
         }
         const percentage = Math.round(
           (submission.answers.filter((answer) => answer.isCorrect).length /
@@ -196,9 +204,8 @@ export default async function handler(
           return res.status(500).send("Error updating submission score");
         }
         sendResults(res, percentage, quizId);
-        return
+        return;
       }
-
     } catch (error) {
       console.error(error);
       res.status(500).send("Error generating image");

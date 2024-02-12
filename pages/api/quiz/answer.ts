@@ -1,54 +1,28 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import { getSSLHubRpcClient, Message } from "@farcaster/hub-nodejs";
+import { getSSLHubRpcClient } from "@farcaster/hub-nodejs";
 import {
   createSubmission,
   getQuestion,
-  getQuestions,
   updateSubmission,
-  updateSubmissionScore,
-} from "@/middleware/helpers";
+} from "@/middleware/supabase";
 import { ISubmission, IQuestion } from "@/app/types/types";
 import { validateMessage } from "@/middleware/farcaster";
 
 const HUB_URL = process.env["HUB_URL"];
 const client = HUB_URL ? getSSLHubRpcClient(HUB_URL) : undefined;
 
-async function sendResults(
+function sendResponse(
+  isCorrect: boolean,
   res: NextApiResponse,
-  percentage: number,
-  quizId: string
+  quizId: string,
+  currentQuestion: IQuestion
 ) {
-  const imageUrl = `${process.env["HOST"]}/api/quiz/image-question?text=${
-    "You scored " + percentage + " percent correct"
-  }`;
+  //   get next question
+  const nextQuestionLink = `${process.env["HOST"]}/api/quiz/question?quiz_id=${quizId}&question_id=${currentQuestion.next_question_id}`;
+  const resultsLink = `${process.env["HOST"]}/api/quiz/results?quiz_id=${quizId}`;
+  const imageUrl = `${process.env["HOST"]}/api/quiz/image-result?correct=${isCorrect}&explanation=${currentQuestion.explanation}`;
   res.setHeader("Content-Type", "text/html");
   res.status(200).send(`
-          <!DOCTYPE html>
-          <html>
-            <head>
-              <title>Vote Recorded</title>
-              <meta property="og:title" content="Vote Recorded">
-              <meta property="og:image" content="${imageUrl}">
-              <meta name="fc:frame" content="vNext">
-              <meta name="fc:frame:image" content="${imageUrl}">
-              <meta name="fc:frame:post_url" content="${process.env["HOST"]}/api/quiz/question?quiz_id=${quizId}&show_results=true">
-  }">
-              <meta name="fc:frame:button:1" content="Done">
-            </head>
-            <body>
-              <p>You scored ${percentage}%</p>
-            </body>
-          </html>
-        `);
-}
-
-function sendResponse(isCorrect: boolean, res: NextApiResponse, quizId: string, currentQuestion: IQuestion) {
-    //   get next question
-    const nextQuestionLink = `${process.env["HOST"]}/api/quiz/question?quiz_id=${quizId}&question_id=${currentQuestion.next_question_id}`;
-    const resultsLink = `${process.env["HOST"]}/api/quiz/results?quiz_id=${quizId}`;
-    const imageUrl = `${process.env["HOST"]}/api/quiz/image-result?correct=${isCorrect}&explanation=${currentQuestion.explanation}`;
-    res.setHeader("Content-Type", "text/html");
-    res.status(200).send(`
         <!DOCTYPE html>
         <html>
             <head>
@@ -57,7 +31,9 @@ function sendResponse(isCorrect: boolean, res: NextApiResponse, quizId: string, 
             <meta property="og:image" content="${imageUrl}">
             <meta name="fc:frame" content="vNext">
             <meta name="fc:frame:image" content="${imageUrl}">
-            <meta name="fc:frame:post_url" content="${currentQuestion.next_question_id ? nextQuestionLink : resultsLink}">
+            <meta name="fc:frame:post_url" content="${
+              currentQuestion.next_question_id ? nextQuestionLink : resultsLink
+            }">
             <meta name="fc:frame:button:1" content="Next question">
             </head>
             <body>
@@ -65,7 +41,6 @@ function sendResponse(isCorrect: boolean, res: NextApiResponse, quizId: string, 
             </body>
         </html>
         `);
-
 }
 
 export default async function handler(
@@ -78,8 +53,11 @@ export default async function handler(
       const questionId = req.query["question_id"] as string;
 
       // validate message
-      const { validatedMessage, fid, buttonId, inputText } =
-        await validateMessage(req, res, client);
+      const { fid, buttonId, inputText } = await validateMessage(
+        req,
+        res,
+        client
+      );
 
       if (!quizId) {
         return res.status(400).send("Missing quiz_id");
@@ -102,8 +80,8 @@ export default async function handler(
           (a) => a.question_id === questionId
         );
         if (previousAnswer) {
-            sendResponse(previousAnswer.isCorrect, res, quizId, currentQuestion);
-          return
+          sendResponse(previousAnswer.isCorrect, res, quizId, currentQuestion);
+          return;
         }
       }
 
