@@ -3,10 +3,12 @@ import { getSSLHubRpcClient } from "@farcaster/hub-nodejs";
 import {
   createSubmission,
   getQuestion,
+  getQuestions,
   updateSubmission,
 } from "@/middleware/supabase";
 import { ISubmission, IQuestion } from "@/app/types/types";
 import { validateMessage } from "@/middleware/farcaster";
+import { getElapsedTimeString } from "@/middleware/helpers";
 
 const HUB_URL = process.env["HUB_URL"];
 const client = HUB_URL ? getSSLHubRpcClient(HUB_URL) : undefined;
@@ -15,12 +17,14 @@ function sendResponse(
   isCorrect: boolean,
   res: NextApiResponse,
   quizId: string,
-  currentQuestion: IQuestion
+  currentQuestion: IQuestion,
+  elapsedTime: string,
+  progress: string
 ) {
   //   get next question
   const nextQuestionLink = `${process.env["HOST"]}/api/quiz/question?quiz_id=${quizId}&question_id=${currentQuestion.next_question_id}`;
   const resultsLink = `${process.env["HOST"]}/api/quiz/results?quiz_id=${quizId}`;
-  const imageUrl = `${process.env["HOST"]}/api/quiz/image-result?correct=${isCorrect}&explanation=${currentQuestion.explanation}`;
+  const imageUrl = `${process.env["HOST"]}/api/quiz/image-result?correct=${isCorrect}&explanation=${currentQuestion.explanation}&time=${elapsedTime}&progress=${progress}`;
   res.setHeader("Content-Type", "text/html");
   res.status(200).send(`
         <!DOCTYPE html>
@@ -68,11 +72,27 @@ export default async function handler(
         fid.toString() || ""
       );
 
+      if(!submission) {
+        return res.status(500).send("Error creating submission");
+      }
+
+      const elapsedTimeString = getElapsedTimeString(submission?.created_at, submission?.time_completed);
+
       //   get question
       const currentQuestion = await getQuestion(quizId, questionId);
       if (!currentQuestion) {
         return res.status(404).send("Question not found");
       }
+
+      // get quiz length
+      const questions = await getQuestions(quizId);
+      if (!questions) {
+        return res.status(500).send("Error fetching questions");
+      }
+      const progress = `${questions.findIndex((q) => q.id === questionId) + 1}/${
+        questions.length
+      }`;
+
 
       //   check if question is already answered
       if (submission && submission.answers) {
@@ -80,7 +100,7 @@ export default async function handler(
           (a) => a.question_id === questionId
         );
         if (previousAnswer) {
-          sendResponse(previousAnswer.isCorrect, res, quizId, currentQuestion);
+          sendResponse(previousAnswer.isCorrect, res, quizId, currentQuestion, elapsedTimeString, progress);
           return;
         }
       }
@@ -121,7 +141,7 @@ export default async function handler(
           res.status(500).send("No submission found");
         }
         // send next question
-        sendResponse(isCorrect, res, quizId, currentQuestion);
+        sendResponse(isCorrect, res, quizId, currentQuestion, elapsedTimeString, progress);
       } catch (error) {
         console.error(error);
         res.status(500).send("Error checking previously answered");

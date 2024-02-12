@@ -1,4 +1,4 @@
-export function getElapsedTimeString(createdAtTimestamp: string, completedAtTimestamp: string | null): string {
+export function getElapsedTimeString(createdAtTimestamp: string, completedAtTimestamp?: string | null): string {
   const start = new Date(createdAtTimestamp);
     const end = completedAtTimestamp ? new Date(completedAtTimestamp) : new Date();
     const elapsed = end.getTime() - start.getTime();

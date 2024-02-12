@@ -16,11 +16,13 @@ const client = HUB_URL ? getSSLHubRpcClient(HUB_URL) : undefined;
 async function sendResults(
   res: NextApiResponse,
   percentage: number,
-  quizId: string
+  quizId: string,
+  elapsedTime: string,
+  progress: string
 ) {
   const imageUrl = `${process.env["HOST"]}/api/quiz/image-question?text=${
     "You scored " + percentage + " percent correct"
-  }`;
+  }&time=${elapsedTime}&progress=${progress}`;
   res.setHeader("Content-Type", "text/html");
   res.status(200).send(`
           <!DOCTYPE html>
@@ -31,7 +33,7 @@ async function sendResults(
               <meta property="og:image" content="${imageUrl}">
               <meta name="fc:frame" content="vNext">
               <meta name="fc:frame:image" content="${imageUrl}">
-              <meta name="fc:frame:post_url" content="${process.env["HOST"]}/api/quiz/question?quiz_id=${quizId}&show_results=true">
+              <meta name="fc:frame:post_url" content="${process.env["HOST"]}/api/quiz/question?quiz_id=${quizId}">
   }">
               <meta name="fc:frame:button:1" content="Done">
             </head>
@@ -46,7 +48,9 @@ async function checkPreviouslyAnswered(
   submission: ISubmission,
   questionId: string,
   res: NextApiResponse,
-  question: IQuestion
+  question: IQuestion,
+  elapsedTime: string,
+  progress: string
 ) {
   if (submission.answers && submission.answers.length > 0) {
     const answeredQuestionIds = submission.answers.map(
@@ -56,7 +60,7 @@ async function checkPreviouslyAnswered(
       // If they have answered this question, return the result
       submission.answers.forEach((answer) => {
         if (answer.question_id === questionId) {
-          const imageUrl = `${process.env["HOST"]}/api/quiz/image-result?explanation=${question.explanation}&correct=${answer.isCorrect}`;
+          const imageUrl = `${process.env["HOST"]}/api/quiz/image-result?explanation=${question.explanation}&correct=${answer.isCorrect}&time=${elapsedTime}&progress=${progress}`;
           res.setHeader("Content-Type", "text/html");
           res.status(200).send(`
                         <!DOCTYPE html>
@@ -108,18 +112,21 @@ export default async function handler(
       if (!submission) {
         return res.status(404).send("Question not found");
       }
+      const elapsedTime = getElapsedTimeString(submission.created_at, submission.time_completed);
 
-      // if already completed, return results
-      if (submission && submission.score) {
-        sendResults(res, submission.score, quizId);
-        return;
-      }
 
       const questions = await getQuestions(quizId);
       if (!questions || questions.length === 0) {
         return res.status(404).send("No questions found");
       }
+      const progress = `${questions.findIndex((question) => question.id === questionId) + 1}/${questions.length}`;
 
+      // if already completed, return results
+      if (submission && submission.score) {
+        sendResults(res, submission.score, quizId, elapsedTime, progress);
+        return;
+      }
+      
       let question: IQuestion | undefined;
       if (!questionId) {
         // get first question
@@ -134,13 +141,12 @@ export default async function handler(
 
       //   check if question has been answered
       try {
-        await checkPreviouslyAnswered(submission, questionId, res, question);
+        await checkPreviouslyAnswered(submission, questionId, res, question, elapsedTime, progress);
       } catch (error) {
         console.error(error);
         res.status(500).send("Error checking previously answered");
       }
 
-      const elapsedTime = getElapsedTimeString(submission.created_at);
       // send question
       const imageUrl = `${process.env["HOST"]}/api/quiz/image-question?text=${question.text}&time=${elapsedTime}`;
       res.setHeader("Content-Type", "text/html");
@@ -203,7 +209,7 @@ export default async function handler(
           console.error("Error updating submission score", error);
           return res.status(500).send("Error updating submission score");
         }
-        sendResults(res, percentage, quizId);
+        sendResults(res, percentage, quizId, elapsedTime, progress);
         return;
       }
     } catch (error) {

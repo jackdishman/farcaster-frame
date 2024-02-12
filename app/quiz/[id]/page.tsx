@@ -28,8 +28,8 @@ export async function generateMetadata(
   const fcMetadata: Record<string, string> = {
     "fc:frame": "vNext",
     "fc:frame:post_url": `${process.env["HOST"]}/api/quiz/question?quiz_id=${id}`,
-    "fc:frame:image": `${process.env["HOST"]}/api/quiz/image?quiz_id=${id}`,
-    "fc:frame:button:1": `Take ${quiz.title} quiz`,
+    "fc:frame:image": `${process.env["HOST"]}/api/quiz/image?title=${quiz.title}&description=${quiz.description}`,
+    "fc:frame:button:1": `Start ${quiz.title}`,
   };
 
   return {
@@ -60,7 +60,9 @@ export default async function Page({ params }: { params: { id: string } }) {
       <main className="flex flex-col items-center justify-center flex-1 px-4 sm:px-20 text-center">
         <h1 className="text-2xl">{quiz.title}</h1>
         <p>{quiz.description}</p>
-        <img src={process.env[`HOST`]+`/api/quiz/image?quiz_id=${params.id}`} />
+        <img src={process.env[`HOST`]+`/api/quiz/image?title=${quiz.title}&description=${quiz.description}`} />
+        <img src={process.env[`HOST`]+ `/api/quiz/image-question?text=${`In what year was the USS constitution created and for how long did it sail?`}&time=12mins&progress=${"1/10"}`} />
+        <img src={process.env[`HOST`]+ `/api/quiz/image-result?explanation=${`In what year was the USS constitution created and for how long did it sail?`}&time=12mins&progress=${"1/10"}&correct=${true}`} />
       </main>
     </div>
   );
