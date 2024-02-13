@@ -16,18 +16,18 @@ export async function generateMetadata(
   console.log(`params id `, id);
   const quiz = await getQuiz(id);
   console.log(`getQuiz off params id `, quiz);
-    if (!quiz) {
-        return {
+  if (!quiz) {
+    return {
+      title: "Quiz not found",
+      openGraph: {
         title: "Quiz not found",
-        openGraph: {
-            title: "Quiz not found",
-            description: "Quiz not found",
-        },
-        metadataBase: new URL(process.env["HOST"] || ""),
-        };
-    }
+        description: "Quiz not found",
+      },
+      metadataBase: new URL(process.env["HOST"] || ""),
+    };
+  }
 
-    const imageUrl = `${process.env["HOST"]}/api/quiz/image?title=${quiz.title}&description=${quiz.description}`;
+  const imageUrl = `${process.env["HOST"]}/api/quiz/image?title=${quiz.title}&description=${quiz.description}`;
   const fcMetadata: Record<string, string> = {
     "fc:frame": "vNext",
     "fc:frame:post_url": `${process.env["HOST"]}/api/quiz/question?quiz_id=${id}&question_id=${quiz.first_question_id}`,
@@ -64,9 +64,24 @@ export default async function Page({ params }: { params: { id: string } }) {
       <main className="flex flex-col items-center justify-center flex-1 px-4 sm:px-20 text-center">
         <h1 className="text-2xl">{quiz.title}</h1>
         <p>{quiz.description}</p>
-        <img src={process.env[`HOST`]+`/api/quiz/image?title=${quiz.title}&description=${quiz.description}`} />
-        <img src={process.env[`HOST`]+ `/api/quiz/image-question?text=${`In what year was the USS constitution created and for how long did it sail?`}&time=12mins&progress=${"1/10"}`} />
-        <img src={process.env[`HOST`]+ `/api/quiz/image-result?explanation=${`In what year was the USS constitution created and for how long did it sail?`}&time=12mins&progress=${"1/10"}&correct=${true}`} />
+        <img
+          src={
+            process.env[`HOST`] +
+            `/api/quiz/image?title=${quiz.title}&description=${quiz.description}`
+          }
+        />
+        <img
+          src={
+            process.env[`HOST`] +
+            `/api/quiz/image-question?text=${`In what year was the USS constitution created and for how long did it sail?`}&time=12mins&progress=${"1/10"}`
+          }
+        />
+        <img
+          src={
+            process.env[`HOST`] +
+            `/api/quiz/image-result?explanation=${`In what year was the USS constitution created and for how long did it sail?`}&time=12mins&progress=${"1/10"}&correct=${true}`
+          }
+        />
       </main>
     </div>
   );
