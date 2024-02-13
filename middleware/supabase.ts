@@ -62,7 +62,7 @@ export async function getQuestions(quizId: string): Promise<IQuestion[] | undefi
     
   }
 
-  export async function getQuestion(quizId: string, questionId?: string): Promise<IQuestion | undefined> {
+  export async function getQuestion(quizId: string, questionId: string): Promise<IQuestion | undefined> {
     try {
       const { data, error } = await supabase
         .from("question")

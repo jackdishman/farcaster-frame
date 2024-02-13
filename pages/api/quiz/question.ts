@@ -123,6 +123,7 @@ export default async function handler(
         return;
       }
 
+      console.log(`prev getQuestion`, quizId, questionId)
       const question = await getQuestion(quizId, questionId);
 
       // completed all questions
