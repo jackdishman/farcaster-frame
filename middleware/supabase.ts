@@ -71,7 +71,7 @@ export async function getQuestions(quizId: string): Promise<IQuestion[] | undefi
         .eq("id", questionId)
         .single();
       if (error) throw error;
-      return data[0] as unknown as IQuestion;
+      return data as IQuestion;
     } catch (error) {
       console.error("Error fetching question", error);
     }
