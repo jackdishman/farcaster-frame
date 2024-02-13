@@ -11,9 +11,11 @@ export async function getQuiz(quizId: string): Promise<IQuiz | undefined> {
       const { data, error } = await supabase
         .from("quiz")
         .select("*")
-        .eq("id", quizId);
+        .eq("id", quizId)
+        .single();
       if (error) throw error;
-      return data[0] as unknown as IQuiz;
+      console.log(`getQuiz`, data)
+      return data as IQuiz;
     } catch (error) {
       console.error("Error fetching quizzes", error);
     }
