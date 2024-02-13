@@ -13,7 +13,8 @@ export async function generateMetadata(
 ): Promise<Metadata> {
   // read route params
   const id = params.id;
-  const quiz: IQuiz | undefined = (await getQuiz(id));
+  const quiz = await getQuiz(id);
+  console.log(quiz);
     if (!quiz) {
         return {
         title: "Quiz not found",
