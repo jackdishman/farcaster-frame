@@ -79,7 +79,9 @@ export default async function handler(
       const elapsedTimeString = getElapsedTimeString(submission?.created_at, submission?.time_completed);
 
       //   get question
+      console.log(`pre currentQuestion `, quizId, questionId)
       const currentQuestion = await getQuestion(quizId, questionId);
+      console.log(`currentQuestion`, currentQuestion)
       if (!currentQuestion) {
         return res.status(404).send("Question not found");
       }
