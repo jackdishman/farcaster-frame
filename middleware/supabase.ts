@@ -14,7 +14,6 @@ export async function getQuiz(quizId: string): Promise<IQuiz | undefined> {
         .eq("id", quizId)
         .single();
       if (error) throw error;
-      console.log(`getQuiz`, data)
       return data as IQuiz;
     } catch (error) {
       console.error("Error fetching quizzes", error);
