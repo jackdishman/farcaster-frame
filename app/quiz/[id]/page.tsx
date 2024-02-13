@@ -27,10 +27,11 @@ export async function generateMetadata(
         };
     }
 
+    const imageUrl = `${process.env["HOST"]}/api/quiz/image?title=${quiz.title}&description=${quiz.description}`;
   const fcMetadata: Record<string, string> = {
     "fc:frame": "vNext",
     "fc:frame:post_url": `${process.env["HOST"]}/api/quiz/question?quiz_id=${id}&question_id=${quiz.first_question_id}`,
-    "fc:frame:image": `${process.env["HOST"]}/api/quiz/image?title=${quiz.title}&description=${quiz.description}`,
+    "fc:frame:image": imageUrl,
     "fc:frame:button:1": `Start ${quiz.title}`,
   };
 
@@ -39,6 +40,7 @@ export async function generateMetadata(
     openGraph: {
       title: quiz.title ?? `Quiz ${id}`,
       description: quiz.description ?? `Quiz ${id}`,
+      images: [{ url: imageUrl }],
     },
     other: {
       ...fcMetadata,
