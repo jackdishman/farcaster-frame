@@ -123,7 +123,6 @@ export default async function handler(
         return;
       }
 
-      console.log(`prev getQuestion`, quizId, questionId)
       const question = questionId ? await getQuestion(quizId, questionId) : questions[0];
 
       // completed all questions
@@ -149,7 +148,7 @@ export default async function handler(
           elapsedTime,
           res
         );
-        return res.status(400).send("Question already answered");
+        return
       }
 
       // send question
