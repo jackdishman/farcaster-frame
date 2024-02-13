@@ -13,8 +13,9 @@ export async function generateMetadata(
 ): Promise<Metadata> {
   // read route params
   const id = params.id;
+  console.log(`params id `, id);
   const quiz = await getQuiz(id);
-  console.log(quiz);
+  console.log(`getQuiz off params id `, quiz);
     if (!quiz) {
         return {
         title: "Quiz not found",
