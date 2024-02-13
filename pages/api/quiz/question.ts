@@ -138,6 +138,14 @@ export default async function handler(
         : null;
       if (submission.answers && previousAnswer) {
         console.log(`skipping question response because already answered`)
+        console.log(          previousAnswer.answer,
+          previousAnswer.isCorrect,
+          question.next_question_id,
+          quizId,
+          progress,
+          elapsedTime,
+          res
+)
         skipQuestionResponse(
           previousAnswer.answer,
           previousAnswer.isCorrect,
