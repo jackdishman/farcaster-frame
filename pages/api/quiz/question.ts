@@ -144,7 +144,6 @@ export default async function handler(
           quizId,
           progress,
           elapsedTime,
-          res
 )
         skipQuestionResponse(
           previousAnswer.answer,
