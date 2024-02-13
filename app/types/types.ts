@@ -3,6 +3,7 @@ export interface IQuiz {
     description: string | null
     id: number
     title: string | null
+    first_question_id: number | null
 }
 
 export interface ISubmission {

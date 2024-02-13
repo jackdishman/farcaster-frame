@@ -27,7 +27,7 @@ export async function generateMetadata(
 
   const fcMetadata: Record<string, string> = {
     "fc:frame": "vNext",
-    "fc:frame:post_url": `${process.env["HOST"]}/api/quiz/question?quiz_id=${id}`,
+    "fc:frame:post_url": `${process.env["HOST"]}/api/quiz/question?quiz_id=${id}&question_id=${quiz.first_question_id}`,
     "fc:frame:image": `${process.env["HOST"]}/api/quiz/image?title=${quiz.title}&description=${quiz.description}`,
     "fc:frame:button:1": `Start ${quiz.title}`,
   };

@@ -124,10 +124,8 @@ export default async function handler(
         return;
       }
 
-      console.log(`questionId`, questionId)
-      const question = questionId ? await getQuestion(quizId, questionId) : questions[0];
-      console.log(`question`, question)
-      
+      const question = await getQuestion(quizId, questionId);
+
       // completed all questions
       if (!question) {
         if (!submission.score) {
