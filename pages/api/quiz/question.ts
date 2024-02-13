@@ -119,7 +119,7 @@ export default async function handler(
       if (!questions || questions.length === 0) {
         return res.status(404).send("No questions found");
       }
-      const progress = submission.answers?.length + `/` + questions.length
+      const progress = (submission.answers ? submission.answers.length : 0) + 1 + `/` + questions.length
 
       // if already completed, return results
       if (submission && submission.score) {
