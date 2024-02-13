@@ -92,9 +92,7 @@ export default async function handler(
 
       console.log(`findIndex`, questions.findIndex((q) => q.id === questionId))
 
-      const progress = `${questions.findIndex((q) => q.id === questionId) + 1}/${
-        questions.length
-      }`;
+      const progress = submission.answers?.length + `/` + questions.length
 
       //   check if question is already answered
       if (submission && submission.answers) {

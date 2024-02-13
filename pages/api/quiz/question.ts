@@ -119,7 +119,7 @@ export default async function handler(
       if (!questions || questions.length === 0) {
         return res.status(404).send("No questions found");
       }
-      const progress = `${questions.findIndex((question) => question.id === questionId) + 1}/${questions.length}`;
+      const progress = submission.answers?.length + `/` + questions.length
 
       // if already completed, return results
       if (submission && submission.score) {
@@ -148,7 +148,7 @@ export default async function handler(
       }
 
       // send question
-      const imageUrl = `${process.env["HOST"]}/api/quiz/image-question?text=${question.text}&time=${elapsedTime}`;
+      const imageUrl = `${process.env["HOST"]}/api/quiz/image-question?text=${question.text}&time=${elapsedTime}&progress=${progress}`;
       res.setHeader("Content-Type", "text/html");
       res.status(200).send(`
                 <!DOCTYPE html>

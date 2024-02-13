@@ -36,7 +36,7 @@ export default async function handler(
             display: "flex",
             flexDirection: "row",
             justifyContent: "space-between",
-            padding: 0,
+            padding: 10,
           }}
         >
           <p
