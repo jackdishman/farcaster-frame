@@ -54,7 +54,6 @@ async function skipQuestionResponse(
 ) {
   console.log(`skipping question response`)
   const text = `You answered ${previousAnswer}, which was ${isPreviousAnswerCorrect ? "correct" : "incorrect"}`;
-  console.log(text)
   const imageUrl = `${process.env["HOST"]}/api/quiz/image-question?text=${text}&time=${elapsedTime}&progress=${progress}`;
   const nextQuestionLink = `${process.env["HOST"]}/api/quiz/question?quiz_id=${quizId}&question_id=${nextQuestionId}`;
   res.setHeader("Content-Type", "text/html");
@@ -65,6 +64,7 @@ async function skipQuestionResponse(
             <title>Vote Recorded</title>
             <meta property="og:title" content="Vote Recorded">
             <meta property="og:image" content="${imageUrl}">
+            <meta name="fc:frame:image" content="${imageUrl}">
             <meta name="fc:frame" content="vNext">
             <meta name="fc:frame:post_url" content="${nextQuestionLink}">
             <meta name="fc:frame:button:1" content="Next question">
