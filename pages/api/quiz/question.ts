@@ -124,7 +124,7 @@ export default async function handler(
       }
 
       console.log(`prev getQuestion`, quizId, questionId)
-      const question = await getQuestion(quizId, questionId);
+      const question = questionId ? await getQuestion(quizId, questionId) : questions[0];
 
       // completed all questions
       if (!question) {
