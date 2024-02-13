@@ -52,6 +52,7 @@ async function skipQuestionResponse(
   elapsedTime: string,
   res: NextApiResponse
 ) {
+  console.log(`skipping question response`)
   const imageUrl = `${process.env["HOST"]}/api/quiz/image-question?text=${
     "You answered " +
     previousAnswer +
