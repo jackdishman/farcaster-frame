@@ -2,6 +2,7 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import { getSSLHubRpcClient } from "@farcaster/hub-nodejs";
 import {
   createSubmission,
+  getQuestion,
   getQuestions,
 } from "@/middleware/supabase";
 import { ISubmission } from "@/app/types/types";
@@ -40,6 +41,41 @@ async function sendResults(
             </body>
           </html>
         `);
+}
+
+async function skipQuestionResponse(
+  previousAnswer: string,
+  isPreviousAnswerCorrect: boolean,
+  nextQuestionId: string,
+  quizId: string,
+  progress: string,
+  elapsedTime: string,
+  res: NextApiResponse
+) {
+  const imageUrl = `${process.env["HOST"]}/api/quiz/image-question?text=${
+    "You answered " +
+    previousAnswer +
+    ", which was " +
+    (isPreviousAnswerCorrect ? "correct" : "incorrect")
+  }&time=${elapsedTime}&progress=${progress}`;
+  const nextQuestionLink = `${process.env["HOST"]}/api/quiz/question?quiz_id=${quizId}&question_id=${nextQuestionId}`;
+  res.setHeader("Content-Type", "text/html");
+  res.status(200).send(`
+        <!DOCTYPE html>
+        <html>
+          <head>
+            <title>Vote Recorded</title>
+            <meta property="og:title" content="Vote Recorded">
+            <meta property="og:image" content="${imageUrl}">
+            <meta name="fc:frame" content="vNext">
+            <meta name="fc:frame:post_url" content="${nextQuestionLink}">
+            <meta name="fc:frame:button:1" content="Next question">
+          </head>
+          <body>
+            <p></p>
+          </body>
+        </html>
+      `);
 }
 
 export default async function handler(
@@ -87,16 +123,7 @@ export default async function handler(
         return;
       }
 
-      // get first question that has not been answered in submissions
-      // find the first question that has not been answered
-      // get array of answered question ids from submissions
-      const answeredQuestionIds = submission.answers
-        ? submission.answers.map((answer) => answer.question_id)
-        : [];
-      // compare to all questions to get id of first unanswered question
-      const question = questions.find(
-        (question) => !answeredQuestionIds.includes(question.id)
-      );
+      const question = await getQuestion(quizId, questionId);
 
       // completed all questions
       if (!question) {
@@ -105,6 +132,23 @@ export default async function handler(
         }
         sendResults(res, submission.score, quizId, elapsedTime, progress);
         return;
+      }
+
+      // check if question has already been completed in submission
+      const previousAnswer = submission.answers
+        ? submission.answers.find((a) => a.question_id === questionId) || null
+        : null;
+      if (submission.answers && previousAnswer) {
+        skipQuestionResponse(
+          previousAnswer.answer,
+          previousAnswer.isCorrect,
+          question.next_question_id,
+          quizId,
+          progress,
+          elapsedTime,
+          res
+        );
+        return res.status(400).send("Question already answered");
       }
 
       // send question
