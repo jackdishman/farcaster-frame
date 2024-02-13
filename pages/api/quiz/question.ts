@@ -5,7 +5,7 @@ import {
   getQuestion,
   getQuestions,
 } from "@/middleware/supabase";
-import { ISubmission } from "@/app/types/types";
+import { IAnswerEntry, IQuestion, ISubmission } from "@/app/types/types";
 import { validateMessage } from "@/middleware/farcaster";
 import { getElapsedTimeString } from "@/middleware/helpers";
 
@@ -44,19 +44,17 @@ async function sendResults(
 }
 
 async function skipQuestionResponse(
-  previousAnswer: string,
-  isPreviousAnswerCorrect: boolean,
-  nextQuestionId: string,
+  previousAnswer: IAnswerEntry,
+  question: IQuestion,
   quizId: string,
   progress: string,
   elapsedTime: string,
-  questionId: string,
   res: NextApiResponse
 ) {
   console.log(`skipping question response`)
-  const text = `Question ${questionId}: you answered ${isPreviousAnswerCorrect ? "correctly" : "incorrectly"}`;
+  const text = `Question ${question.text}: you answered ${previousAnswer.isCorrect ? "correctly" : "incorrectly"}`;
   const imageUrl = `${process.env["HOST"]}/api/quiz/image-question?text=${text}&time=${elapsedTime}&progress=${progress}`;
-  const nextQuestionLink = `${process.env["HOST"]}/api/quiz/question?quiz_id=${quizId}&question_id=${nextQuestionId}`;
+  const nextQuestionLink = `${process.env["HOST"]}/api/quiz/question?quiz_id=${quizId}&question_id=${question.next_question_id}`;
   res.setHeader("Content-Type", "text/html");
   res.status(200).send(`
         <!DOCTYPE html>
@@ -141,13 +139,11 @@ export default async function handler(
         console.log(`skipping question response because already answered`)
         console.log(previousAnswer)
         skipQuestionResponse(
-          previousAnswer.answer,
-          previousAnswer.isCorrect,
-          question.next_question_id,
+          previousAnswer,
+          question,
           quizId,
           progress,
           elapsedTime,
-          questionId,
           res
         );
         return
