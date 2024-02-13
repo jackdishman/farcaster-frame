@@ -89,10 +89,12 @@ export default async function handler(
       if (!questions) {
         return res.status(500).send("Error fetching questions");
       }
+
+      console.log(`findIndex`, questions.findIndex((q) => q.id === questionId))
+
       const progress = `${questions.findIndex((q) => q.id === questionId) + 1}/${
         questions.length
       }`;
-
 
       //   check if question is already answered
       if (submission && submission.answers) {
@@ -120,7 +122,6 @@ export default async function handler(
       }
 
       // update submission entry
-      console.log(`isCorrect`, isCorrect);
       try {
         if (!submission) {
           throw new Error("Submission not found");

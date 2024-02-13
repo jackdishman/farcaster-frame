@@ -15,6 +15,7 @@ export default async function handler(
     const text = req.query["text"];
     const time = req.query["time"];
     const progress = req.query["progress"];
+    console.log(`image-question time and progress`, time, progress)
 
     const svg = await satori(
       <div

@@ -10,7 +10,6 @@ async function getQuizzes() {
   try {
     const { data, error } = await supabase.from("quiz").select("*");
     if (error) throw error;
-    console.log(data);
     return data;
   } catch (error) {
     console.error("Error fetching quizzes", error);
@@ -19,7 +18,6 @@ async function getQuizzes() {
 
 export default async function Page() {
   const quizzes = await getQuizzes();
-  console.log(quizzes);
   return (
     <div>
       <h1 className="text-2xl">Quizzes</h1>
