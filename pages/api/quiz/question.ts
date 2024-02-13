@@ -52,7 +52,7 @@ async function skipQuestionResponse(
   res: NextApiResponse
 ) {
   console.log(`skipping question response`)
-  const text = `Question ${question.text}: you answered ${previousAnswer.isCorrect ? "correctly" : "incorrectly"}`;
+  const text = `Question: ${question.text}, you answered ${previousAnswer.isCorrect ? "correctly" : "incorrectly"}`;
   const imageUrl = `${process.env["HOST"]}/api/quiz/image-question?text=${text}&time=${elapsedTime}&progress=${progress}`;
   const nextQuestionLink = `${process.env["HOST"]}/api/quiz/question?quiz_id=${quizId}&question_id=${question.next_question_id}`;
   res.setHeader("Content-Type", "text/html");
