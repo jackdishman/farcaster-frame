@@ -101,7 +101,7 @@ export default async function handler(
       );
 
       if (!submission) {
-        return res.status(404).send("Question not found");
+        return res.status(404).send("submission not found");
       }
       const elapsedTime = getElapsedTimeString(
         submission.created_at,
@@ -140,6 +140,7 @@ export default async function handler(
         ? submission.answers.find((a) => a.question_id === questionId) || null
         : null;
       if (submission.answers && previousAnswer) {
+        console.log(`skipping question response because already answered`)
         skipQuestionResponse(
           previousAnswer.answer,
           previousAnswer.isCorrect,
@@ -151,6 +152,8 @@ export default async function handler(
         );
         return
       }
+
+      console.log(`should not get here on repeat`)
 
       // send question
       const imageUrl = `${process.env["HOST"]}/api/quiz/image-question?text=${question.text}&time=${elapsedTime}&progress=${progress}`;
