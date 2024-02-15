@@ -11,6 +11,7 @@ export async function validateMessage(req: NextApiRequest, res: NextApiResponse,
       if (result && result.isOk() && result.value.valid) {
         validatedMessage = result.value.message;
       }
+      console.log(`validatedMessage`, validatedMessage);
       // Also validate the frame url matches the expected url
       let urlBuffer = validatedMessage?.data?.frameActionBody?.url || [];
       const urlString = Buffer.from(urlBuffer).toString("utf-8");
@@ -18,13 +19,18 @@ export async function validateMessage(req: NextApiRequest, res: NextApiResponse,
         validatedMessage &&
         !urlString.startsWith(process.env["HOST"] || "")
       ) {
+        console.log(`Invalid frame url: ${urlBuffer}`)
         res.status(400).send(`Invalid frame url: ${urlBuffer}`)
         return { validatedMessage, fid: 0, buttonId: 0, inputText: "" };
     }
     } catch (e) {
+      console.log(`Failed to validate message: ${e}`);
         res.status(400).send(`Failed to validate message: ${e}`);
       return { validatedMessage, fid: 0, buttonId: 0, inputText: "" };
     }
+
+    console.log(`no hub`)
+
 
     // If HUB_URL is not provided, don't validate and fall back to untrusted data
     let fid = 0,
