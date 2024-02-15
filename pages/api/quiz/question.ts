@@ -19,6 +19,7 @@ async function sendResults(
   elapsedTime: string,
   progress: string
 ) {
+  console.log(`sending results`)
   const imageUrl = `${process.env["HOST"]}/api/quiz/image-question?text=${
     "You scored " + percentage + " percent correct"
   }&time=${elapsedTime}&progress=${progress}`;
@@ -116,6 +117,7 @@ export default async function handler(
 
       // if already completed, return results
       if (submission && submission.score) {
+        console.log(`submission score`, submission.score)
         sendResults(res, submission.score, quizId, elapsedTime, progress);
         return;
       }
