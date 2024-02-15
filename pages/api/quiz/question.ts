@@ -32,7 +32,7 @@ async function sendResults(
               <meta property="og:image" content="${imageUrl}">
               <meta name="fc:frame" content="vNext">
               <meta name="fc:frame:image" content="${imageUrl}">
-              <meta name="fc:frame:post_url" content="${process.env["HOST"]}/api/quiz/question?quiz_id=${quizId}">
+              <meta name="fc:frame:post_url" content="${process.env["HOST"]}/api/quiz/results?quiz_id=${quizId}">
   }">
               <meta name="fc:frame:button:1" content="Done">
             </head>
