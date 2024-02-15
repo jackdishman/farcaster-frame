@@ -22,9 +22,11 @@ export default async function handler(
       res.status(200).send("No submissions yet");
       return;
     }
+    console.log(`submissions`, submissions)
     // get top 5 submissions
     let svg;
     const topSubmissionsFidList = submissions.slice(0, 5).map((s) => s.fid);
+    console.log(`topSubmissionsFidList`, topSubmissionsFidList)
     if(topSubmissionsFidList.length === 0) {
         svg = await satori(
             <div

@@ -1,10 +1,14 @@
 import { init, fetchQuery } from "@airstack/node";
 
 export async function getFarcasterUsernames(fidList: (string | null)[]) {
+
   init(process.env.AIRSTACK_API_KEY ?? ``);
+
+  console.log("fidList:", fidList);
   if (!fidList) {
     return [];
   }
+
   try {
     const query = `
   query MyQuery {
