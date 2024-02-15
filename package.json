@@ -6,6 +6,7 @@
     "start": "next start"
   },
   "dependencies": {
+    "@airstack/node": "^0.0.5",
     "@farcaster/hub-nodejs": "^0.10.21",
     "@supabase/supabase-js": "^2.39.3",
     "@types/node": "20.11.0",
