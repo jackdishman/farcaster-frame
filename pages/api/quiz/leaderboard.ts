@@ -1,0 +1,63 @@
+import type { NextApiRequest, NextApiResponse } from "next";
+import { getSSLHubRpcClient } from "@farcaster/hub-nodejs";
+import { validateMessage } from "@/middleware/farcaster";
+
+const HUB_URL = process.env["HUB_URL"];
+const client = HUB_URL ? getSSLHubRpcClient(HUB_URL) : undefined;
+
+async function sendResults(
+  res: NextApiResponse,
+  fid: string,
+    quizId: string,
+) {
+  const imageUrl = `${process.env["HOST"]}/api/quiz/image-leaderboard?fid=${fid}&quiz_id=${quizId}`;
+  res.setHeader("Content-Type", "text/html");
+  res.status(200).send(`
+          <!DOCTYPE html>
+          <html>
+            <head>
+              <title>Vote Recorded</title>
+              <meta property="og:title" content="Vote Recorded">
+              <meta property="og:image" content="${imageUrl}">
+              <meta name="fc:frame" content="vNext">
+              <meta name="fc:frame:image" content="${imageUrl}">
+
+              <meta name="fc:frame:post_url" content="${process.env["HOST"]}/api/quiz/leaderboard?id=${quizId}">
+              <meta name="fc:frame:button:1" content="Leaderboard">
+
+
+              <meta property="fc:frame:button:2" content="Give feedback" />
+              <meta property="fc:frame:button:2:action" content="link" />
+              <meta property="fc:frame:button:2:target" content="https://warpcast.com/dish" />  
+
+              </head>
+            <body>
+            </body>
+          </html>
+        `);
+}
+
+export default async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse
+) {
+  if (req.method === "POST") {
+    try {
+      const quizId = req.query["quiz_id"] as string;
+      // validate message
+      const { fid } = await validateMessage(req, res, client);
+        if (!quizId) {
+            return res.status(400).send("Missing quiz_id");
+        }
+        await sendResults(res, fid.toString(), quizId);
+
+    } catch (error) {
+      console.error(error);
+      res.status(500).send("Error generating image");
+    }
+  } else {
+    // Handle any non-POST requests
+    res.setHeader("Allow", ["POST"]);
+    res.status(405).end(`Method ${req.method} Not Allowed`);
+  }
+}

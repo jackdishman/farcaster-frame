@@ -16,7 +16,7 @@ async function sendResults(
   res: NextApiResponse,
   percentage: number,
   quizId: string,
-    elapsedTime: string
+  elapsedTime: string
 ) {
   const imageUrl = `${process.env["HOST"]}/api/quiz/image-question?text=${
     "You scored " + percentage + " percent correct"
@@ -31,10 +31,16 @@ async function sendResults(
               <meta property="og:image" content="${imageUrl}">
               <meta name="fc:frame" content="vNext">
               <meta name="fc:frame:image" content="${imageUrl}">
-              <meta name="fc:frame:post_url" content="${process.env["HOST"]}/api/quiz/question?quiz_id=${quizId}&show_results=true">
-  }">
-              <meta name="fc:frame:button:1" content="Done">
-            </head>
+
+              <meta name="fc:frame:post_url" content="${process.env["HOST"]}/api/quiz/leaderboard?id=${quizId}">
+              <meta name="fc:frame:button:1" content="Leaderboard">
+
+
+              <meta property="fc:frame:button:2" content="Give feedback" />
+              <meta property="fc:frame:button:2:action" content="link" />
+              <meta property="fc:frame:button:2:target" content="https://warpcast.com/dish" />  
+
+              </head>
             <body>
               <p>You scored ${percentage}%</p>
               <p>Elapsed time: ${elapsedTime}</p>
