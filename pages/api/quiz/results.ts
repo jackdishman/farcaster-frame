@@ -1,5 +1,4 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import { getSSLHubRpcClient } from "@farcaster/hub-nodejs";
 import {
   createSubmission,
   getQuestions,
@@ -8,9 +7,6 @@ import {
 import { ISubmission } from "@/app/types/types";
 import { validateMessage } from "@/middleware/farcaster";
 import { getElapsedTimeString } from "@/middleware/helpers";
-
-const HUB_URL = process.env["HUB_URL"];
-const client = HUB_URL ? getSSLHubRpcClient(HUB_URL) : undefined;
 
 async function sendResults(
   res: NextApiResponse,
@@ -58,7 +54,7 @@ export default async function handler(
       const quizId = req.query["quiz_id"] as string;
 
       // validate message
-      const { fid } = await validateMessage(req, res, client);
+      const { fid } = await validateMessage(req, res);
 
       if (!quizId) {
         return res.status(400).send("Missing quiz_id");
