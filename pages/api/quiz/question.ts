@@ -150,7 +150,8 @@ export default async function handler(
         );
         return
       }
-
+      console.log(`previousAnswer`, previousAnswer)
+      console.log(`submission.score`, submission.score)
       console.log(`should not get here on repeat`)
 
       // send question
