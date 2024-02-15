@@ -4,14 +4,12 @@ import { NextApiRequest, NextApiResponse } from "next";
 export async function validateMessage(req: NextApiRequest, res: NextApiResponse): Promise<{ validatedMessage: Message | undefined, fid: number, buttonId: number, inputText: string }> {
   const HUB_URL = process.env['HUB_URL']
   const client = HUB_URL ? getSSLHubRpcClient(HUB_URL) : undefined;
-  console.log(`-> client`, client);
   let validatedMessage: Message | undefined = undefined;
     try {
       const frameMessage = Message.decode(
         Buffer.from(req.body?.trustedData?.messageBytes || "", "hex")
       );
       const result = await client?.validateMessage(frameMessage);
-      console.log(`-> result`, result);
       if (result && result.isOk() && result.value.valid) {
         validatedMessage = result.value.message;
       }
@@ -29,9 +27,6 @@ export async function validateMessage(req: NextApiRequest, res: NextApiResponse)
         res.status(400).send(`Failed to validate message: ${e}`);
       return { validatedMessage, fid: 0, buttonId: 0, inputText: "" };
     }
-
-    console.log(`no hub`)
-
 
     // If HUB_URL is not provided, don't validate and fall back to untrusted data
     let fid = 0,
