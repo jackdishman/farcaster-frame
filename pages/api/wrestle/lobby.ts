@@ -25,7 +25,7 @@
 //               <meta name="fc:frame:button:2" content="Reject Challenge">
 
 //               <meta name="fc:frame:post_url" content="${process.env["HOST"]}/api/wrestle/propose?id=${matchId}">
-//               <meta name="fc:frame:button:2" content="Propose New Challenge">
+//               <meta name="fc:frame:button:3" content="Propose New Challenge">
             
 //               </head>
 //             <body>
