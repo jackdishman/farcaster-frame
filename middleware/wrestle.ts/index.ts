@@ -10,7 +10,7 @@ export async function getChallenges(fid: number): Promise<IMatch | null> {
     try {
         const { data, error } = await supabase.from("match").select("*").eq("opponent", fid).single();
         if (error) throw error;
-        return data as IMatch;
+        return data ? data as IMatch : null;
     }
     catch (error) {
         console.error("Error fetching match", error);
