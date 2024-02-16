@@ -16,7 +16,7 @@ async function sendResults(
               <meta property="og:image" content="${imageUrl}">
               <meta name="fc:frame:image" content="${imageUrl}">
 
-              <meta name="fc:frame:post_url" content="${process.env["HOST"]}/api/lobby">
+              <meta name="fc:frame:post_url" content="${process.env["HOST"]}/api/wrestle/lobby">
               <meta name="fc:frame:button:1" content="Accept Challenge">
   
               </head>
