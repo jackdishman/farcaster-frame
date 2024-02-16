@@ -8,10 +8,10 @@ const supabase = createClient(
   
 export async function getChallenges(fid: number): Promise<IMatch[] | null> {
     try {
-        const { data, error } = await supabase.from("match").select("*").eq("opponent", fid).single();
+        const { data, error } = await supabase.from("match").select("*").eq("opponent", fid);
         if (error) throw error;
         console.log(data);
-        return []
+        return [];
         // return data ? data as IMatch : null;
     }
     catch (error) {
