@@ -22,12 +22,11 @@ async function sendChallengeRequest(
               <meta name="fc:frame:button:1" content="Accept Challenge">
 
               <meta name="fc:frame:post_url" content="${process.env["HOST"]}/api/wrestle/reject?id=${matchId}">
-              <meta name="fc:frame:button:1" content="Reject Challenge">
+              <meta name="fc:frame:button:2" content="Reject Challenge">
 
-              <meta name="fc:frame:post_url" content="${process.env["HOST"]}/api/wrestle/reject?id=${matchId}">
-              <meta name="fc:frame:button:1" content="Reject Challenge">
+              <meta name="fc:frame:post_url" content="${process.env["HOST"]}/api/wrestle/propose?id=${matchId}">
+              <meta name="fc:frame:button:2" content="Propose New Challenge">
             
-              <meta name="fc:frame:input:text" content="${process.env["HOST"]}/api/wrestle/challenge">
               </head>
             <body>
               <p>Challenge a wrestler</p>
