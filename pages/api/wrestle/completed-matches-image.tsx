@@ -24,11 +24,12 @@ export default async function handler(
           backgroundColor: "#111",
           padding: 15,
           lineHeight: 1,
-          fontSize: 24,
+          fontSize: 20,
           display: "flex",
           flexDirection: "column",
         }}
       >
+        <h1 style={{ color: "turquoise"}}>Most recent 5 matches:</h1>
         {matches
           ? matches.map((match, index) => {
               return (
