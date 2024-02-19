@@ -113,3 +113,17 @@ export async function getQuestions(quizId: string): Promise<IQuestion[] | undefi
       console.error("Error updating submission", error);
     }
   }
+
+  export async function getSubmissions(quizId: string): Promise<ISubmission[] | undefined> {
+    try {
+      const { data, error } = await supabase
+        .from("submissions")
+        .select("*")
+        .eq("quiz_id", quizId)
+        .order('score', {ascending: false});
+      if (error) throw error;
+      return data as unknown as ISubmission[];
+    } catch (error) {
+      console.error("Error fetching submissions", error);
+    }
+  }

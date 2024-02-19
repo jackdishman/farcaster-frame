@@ -1,5 +1,4 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import { getSSLHubRpcClient } from "@farcaster/hub-nodejs";
 import {
   createSubmission,
   getQuestion,
@@ -9,9 +8,6 @@ import {
 import { ISubmission, IQuestion } from "@/app/types/types";
 import { validateMessage } from "@/middleware/farcaster";
 import { getElapsedTimeString } from "@/middleware/helpers";
-
-const HUB_URL = process.env["HUB_URL"];
-const client = HUB_URL ? getSSLHubRpcClient(HUB_URL) : undefined;
 
 function sendResponse(
   isCorrect: boolean,
@@ -59,8 +55,7 @@ export default async function handler(
       // validate message
       const { fid, buttonId, inputText } = await validateMessage(
         req,
-        res,
-        client
+        res
       );
 
       if (!quizId) {

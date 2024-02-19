@@ -82,7 +82,6 @@ function getMeta(
 
 
 export default async function Page({params}: { params: {id: string}}) {
-    console.log(`here`)
     const poll = await getPoll(params.id);
 
     return(

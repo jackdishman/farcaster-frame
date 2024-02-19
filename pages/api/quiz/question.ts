@@ -1,5 +1,4 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import { getSSLHubRpcClient } from "@farcaster/hub-nodejs";
 import {
   createSubmission,
   getQuestion,
@@ -9,9 +8,6 @@ import { IAnswerEntry, IQuestion, ISubmission } from "@/app/types/types";
 import { validateMessage } from "@/middleware/farcaster";
 import { getElapsedTimeString } from "@/middleware/helpers";
 
-const HUB_URL = process.env["HUB_URL"];
-const client = HUB_URL ? getSSLHubRpcClient(HUB_URL) : undefined;
-
 async function sendResults(
   res: NextApiResponse,
   percentage: number,
@@ -19,6 +15,7 @@ async function sendResults(
   elapsedTime: string,
   progress: string
 ) {
+  console.log(`sending results`)
   const imageUrl = `${process.env["HOST"]}/api/quiz/image-question?text=${
     "You scored " + percentage + " percent correct"
   }&time=${elapsedTime}&progress=${progress}`;
@@ -32,7 +29,7 @@ async function sendResults(
               <meta property="og:image" content="${imageUrl}">
               <meta name="fc:frame" content="vNext">
               <meta name="fc:frame:image" content="${imageUrl}">
-              <meta name="fc:frame:post_url" content="${process.env["HOST"]}/api/quiz/question?quiz_id=${quizId}">
+              <meta name="fc:frame:post_url" content="${process.env["HOST"]}/api/quiz/results?quiz_id=${quizId}">
   }">
               <meta name="fc:frame:button:1" content="Done">
             </head>
@@ -85,7 +82,7 @@ export default async function handler(
       const questionId = req.query["question_id"] as string;
 
       // validate message
-      const { fid } = await validateMessage(req, res, client);
+      const { fid } = await validateMessage(req, res);
 
       if (!quizId) {
         return res.status(400).send("Missing quiz_id");
@@ -116,6 +113,7 @@ export default async function handler(
 
       // if already completed, return results
       if (submission && submission.score) {
+        console.log(`submission score`, submission.score)
         sendResults(res, submission.score, quizId, elapsedTime, progress);
         return;
       }
@@ -148,7 +146,8 @@ export default async function handler(
         );
         return
       }
-
+      console.log(`previousAnswer`, previousAnswer)
+      console.log(`submission.score`, submission.score)
       console.log(`should not get here on repeat`)
 
       // send question
