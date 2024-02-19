@@ -7,6 +7,7 @@ async function sendResults(
     quizId: string,
 ) {
   const imageUrl = `${process.env["HOST"]}/api/quiz/image-leaderboard?fid=${fid}&quiz_id=${quizId}`;
+  console.log("image url", imageUrl);
   res.setHeader("Content-Type", "text/html");
   res.status(200).send(`
           <!DOCTYPE html>
@@ -18,13 +19,9 @@ async function sendResults(
               <meta name="fc:frame" content="vNext">
               <meta name="fc:frame:image" content="${imageUrl}">
 
-              <meta name="fc:frame:post_url" content="${process.env["HOST"]}/api/quiz/leaderboard?quiz_id=${quizId}">
-              <meta name="fc:frame:button:1" content="Leaderboard">
-
-
-              <meta property="fc:frame:button:2" content="Give feedback" />
-              <meta property="fc:frame:button:2:action" content="link" />
-              <meta property="fc:frame:button:2:target" content="https://warpcast.com/dish" />  
+              <meta property="fc:frame:button:1" content="Give feedback" />
+              <meta property="fc:frame:button:1:action" content="link" />
+              <meta property="fc:frame:button:1:target" content="https://warpcast.com/dish" />  
 
               </head>
             <body>

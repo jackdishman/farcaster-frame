@@ -119,7 +119,6 @@ export async function getQuestions(quizId: string): Promise<IQuestion[] | undefi
       const { data, error } = await supabase
         .from("submissions")
         .select("*")
-        .not("score", "is", null)
         .eq("quiz_id", quizId)
         .order('score', {ascending: false});
       if (error) throw error;

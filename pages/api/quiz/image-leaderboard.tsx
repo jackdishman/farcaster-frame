@@ -24,11 +24,8 @@ export default async function handler(
     }
     // get top 5 submissions
     let svg;
-    const topSubmissionsFidList = submissions.slice(0, 5).map((s) => s.fid);
-    console.log(`topSubmissionsFidList`, topSubmissionsFidList)
-
     // nobody has answered yet
-    if(topSubmissionsFidList.length === 0) {
+    if(submissions.length === 0) {
         svg = await satori(
             <div
                 style={{
@@ -64,15 +61,23 @@ export default async function handler(
             }
             );
     } else {
-        const usernameList = await getFarcasterUsernames(topSubmissionsFidList);
-        console.log(`usernameList with and painting leaderboard`, usernameList)
+      const topSubmissionsFidList = submissions.slice(0, 5).map((s) => s.fid);
+      const topPlayerScores: { fid: string | null; score: number | null, fname: string }[] = [];
+      const usernameList = await getFarcasterUsernames(topSubmissionsFidList);
+      // combine usernameList with topSubmissionsFidList into topPlayerScores
+      topSubmissionsFidList.forEach((fid, index) => {
+        topPlayerScores.push({fid, score: submissions[index].score, fname: usernameList[index]});
+      }
+      );
+      console.log(topPlayerScores);
+
         svg = await satori(
           <div
             style={{
               width: "100%",
               height: "100%",
               backgroundColor: "#111",
-              padding: 10,
+              padding: 40,
               lineHeight: 1.2,
               fontSize: 24,
               display: "flex",
@@ -92,11 +97,17 @@ export default async function handler(
                 }}
               >
                 {/* display the top submission fids */}
-                <ol>
-                    {usernameList.map((u: string) => {
-                        return <li key={u}>{u}</li>;
-                    })}
-                </ol>
+                <div style={{
+                    display: "flex",
+                    flexDirection: "column",
+                }}>
+                    {topPlayerScores.map((s, index) => {
+                        return (
+                            <p key={index}>{s.fname} - {s.score}</p>
+                        );
+                    }
+                    )}
+                </div>
               </p>
           </div>,
           {
