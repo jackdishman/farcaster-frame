@@ -81,7 +81,7 @@ export async function getCompletedMatches(): Promise<IMatch[] | null> {
     const { data, error } = await supabase
       .from("match")
       .select("*")
-      .range(0, 9)
+      .range(0, 4)
       .not("opponent_start_time", "is", null) // Filter out NULL values
       .order("opponent_start_time", { ascending: false });
     console.log(error);
