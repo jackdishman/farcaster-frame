@@ -37,7 +37,7 @@ export default async function Page({ params }: { params: { id: string } }) {
         <img
           src={
             process.env[`HOST`] +
-            `/wrestle.jpeg`
+            `/api/wrestle/completed-matches-image`
           }
         />
       </main>

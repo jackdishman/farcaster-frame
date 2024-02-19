@@ -18,6 +18,10 @@ async function sendPendingOpponent(
         <meta property="og:title" content="Vote Recorded">
         <meta property="og:image" content="${imageUrl}">
         <meta name="fc:frame:image" content="${imageUrl}">
+
+        <meta name="fc:frame:post_url" content="${process.env["HOST"]}/api/wrestle/completed-matches">
+        <meta name="fc:frame:button:1" content="Completed Matches">
+
         </head>
       <body>
         <p>Challenge a wrestler</p>
@@ -47,8 +51,8 @@ async function sendPendingOpponent(
         <meta property="og:image" content="${imageUrl}">
         <meta name="fc:frame:image" content="${imageUrl}">
   
-        <meta name="fc:frame:post_url" content="${process.env["HOST"]}/api/wrestle/push?matchId=${matchId}">
-        <meta name="fc:frame:button:1" content="Lobby & match results frames (coming soon)">
+        <meta name="fc:frame:post_url" content="${process.env["HOST"]}/api/wrestle/completed-matches">
+        <meta name="fc:frame:button:1" content="Completed Matches">
       
         </head>
       <body>
