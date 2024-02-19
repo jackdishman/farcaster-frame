@@ -1,9 +1,10 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { validateMessage } from "@/middleware/farcaster";
 import { getChallenges } from "@/middleware/wrestle.ts";
+import { IMatch } from "@/app/types/wrestle";
 
-async function sendChallenge(res: NextApiResponse) {
-  const imageUrl = `${process.env["HOST"]}/wrestle.jpeg`;
+async function acceptChallenge(res: NextApiResponse, matches: IMatch[]) {
+  const imageUrl = `${process.env["HOST"]}/api/wrestle/accept-challenge-image?challenger_fname=${matches[0].challenger_fname}`;
   res.setHeader("Content-Type", "text/html");
   res.status(200).send(`
           <!DOCTYPE html>
@@ -15,7 +16,7 @@ async function sendChallenge(res: NextApiResponse) {
               <meta property="og:image" content="${imageUrl}">
               <meta name="fc:frame:image" content="${imageUrl}">
 
-              <meta name="fc:frame:post_url" content="${process.env["HOST"]}/api/wrestle/lobby">
+              <meta name="fc:frame:post_url" content="${process.env["HOST"]}/api/wrestle/accept?matchId=${matches[0].id}">
               <meta name="fc:frame:button:1" content="Accept Challenge">
   
               </head>
@@ -39,9 +40,11 @@ async function sendRequestForm(res: NextApiResponse) {
               <meta property="og:image" content="${imageUrl}">
               <meta name="fc:frame:image" content="${imageUrl}">
 
-              <meta name="fc:frame:post_url" content="${process.env["HOST"]}/api/wrestle/lobby">
-              <meta name="fc:frame:input:text" content="Enter username">
-  
+              <meta name="fc:frame:post_url" content="${process.env["HOST"]}/api/wrestle/send-challenge">
+              <meta name="fc:frame:input:text" content="Enter username (ex: @dish)">
+
+              <meta name="fc:frame:button:1" content="Challenge">
+                
               </head>
             <body>
               <p>Challenge a wrestler</p>
@@ -59,14 +62,26 @@ export default async function handler(
     try {
       // validate message
       const { fid } = await validateMessage(req, res);
+      
       //check for challenges
-      const match = await getChallenges(fid);
-      console.log(match);
-      if(match){
+      const allMatches = await getChallenges(fid);
+      if(!allMatches || allMatches.length === 0){
+        console.log(`no challenges at all`)
         await sendRequestForm(res);
-      }else{
-        await sendChallenge(res);
+        return
       }
+      const matches = allMatches.filter((match: IMatch) => match.opponent_start_time === null);
+      console.log(`matches`, matches);
+      if(!matches || matches.length === 0){
+        // no challenges
+        console.log(`no challenges incomplete`)
+        await sendRequestForm(res);
+        return
+      }
+      // if there are challenges that are not completed:
+      // view challenges
+      await acceptChallenge(res, matches);
+      
     } catch (error) {
       console.error(error);
       res.status(500).send("Error generating image");

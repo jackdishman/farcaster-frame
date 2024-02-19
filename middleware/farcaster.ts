@@ -10,6 +10,11 @@ export async function validateMessage(req: NextApiRequest, res: NextApiResponse)
         Buffer.from(req.body?.trustedData?.messageBytes || "", "hex")
       );
       const result = await client?.validateMessage(frameMessage);
+      if(!result?.isOk()) {
+        // Hub is not available, fall back to untrusted data
+        res.status(400).send(`Failed to validate message. Check HUB_URL`);
+        return { validatedMessage, fid: -1, buttonId: 0, inputText: "" };
+      }
       if (result && result.isOk() && result.value.valid) {
         validatedMessage = result.value.message;
       }
