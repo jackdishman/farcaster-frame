@@ -70,6 +70,7 @@ export function createBubbleChart(data: IFollower[], container: HTMLElement) {
           height: "mapData(followerCount, 0, 2000, 20, 60)",
           "font-size": "24px",
           "text-max-width": "80%",
+        //   @ts-ignore
           padding: "10px",
         },
       },
@@ -87,7 +88,8 @@ export function createBubbleChart(data: IFollower[], container: HTMLElement) {
     headless: false,
     layout: {
       name: "cola",
-      fit: true,
+        //   @ts-ignore
+        fit: true,
       padding: 10,
     },
 
