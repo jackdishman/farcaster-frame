@@ -2,8 +2,7 @@
 import { Metadata } from "next";
 
 export async function generateMetadata(): Promise<Metadata> {
-
-    const imageUrl = `${process.env["NEXT_PUBLIC_HOST"]}/followers.png`;
+  const imageUrl = `${process.env["NEXT_PUBLIC_HOST"]}/followers.png`;
   const fcMetadata: Record<string, string> = {
     "fc:frame": "vNext",
     "fc:frame:post_url": `${process.env["NEXT_PUBLIC_HOST"]}/api/followers/graph`,
@@ -26,9 +25,11 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function Page() {
-    return (
-        <div>
-            <h1 className="text-h1">Frame page to fetch followers of a Farcaster user (more coming soon)</h1>
-        </div>
-    )
+  return (
+    <div>
+      <h1 className="text-h1">
+        Frame page to fetch followers of a Farcaster user (more coming soon)
+      </h1>
+    </div>
+  );
 }

@@ -51,7 +51,11 @@ export async function getFollowersStats(fid: string): Promise<IFollower[]> {
         throw error;
       }
       data.SocialFollowers.Follower.forEach((follower: any) => {
-        if (!follower.followerAddress.socials || follower.followerAddress.socials.length === 0) return;
+        if (
+          !follower.followerAddress.socials ||
+          follower.followerAddress.socials.length === 0
+        )
+          return;
         const followerInfo: IFollower = {
           profileName: follower.followerAddress.socials[0].profileName,
           followerCount: follower.followerAddress.socials[0].followerCount,

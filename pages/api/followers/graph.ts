@@ -2,9 +2,9 @@ import { validateMessage } from "@/middleware/farcaster";
 import type { NextApiRequest, NextApiResponse } from "next";
 
 async function sendChart(res: NextApiResponse, fid: string) {
-    const imageUrl = `${process.env["NEXT_PUBLIC_HOST"]}/api/followers/graph-image?fid=${fid}`;
-    res.setHeader("Content-Type", "text/html");
-    res.status(200).send(`
+  const imageUrl = `${process.env["NEXT_PUBLIC_HOST"]}/api/followers/graph-image?fid=${fid}`;
+  res.setHeader("Content-Type", "text/html");
+  res.status(200).send(`
             <!DOCTYPE html>
             <html>
               <head>
@@ -24,22 +24,23 @@ async function sendChart(res: NextApiResponse, fid: string) {
               </body>
             </html>
           `);
-      
 }
 
-export default async function handler (req: NextApiRequest, res: NextApiResponse) {
- if (req.method === "POST") {
+export default async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse
+) {
+  if (req.method === "POST") {
     try {
-        const vRes = await validateMessage(req, res);
-        const fid = vRes?.fid.toString();
+      const vRes = await validateMessage(req, res);
+      const fid = vRes?.fid.toString();
 
-        await sendChart(res, fid);
-    
+      await sendChart(res, fid);
     } catch (error) {
-        console.error("Error fetching followers", error);
-        return null;
+      console.error("Error fetching followers", error);
+      return null;
     }
-    } else {
-        res.status(405).send("Method not allowed");
-    }
+  } else {
+    res.status(405).send("Method not allowed");
+  }
 }
