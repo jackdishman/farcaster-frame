@@ -1,5 +1,6 @@
 import { IFollower } from "@/types/followers";
 import cytoscape from "cytoscape";
+// @ts-ignore
 import cola from "cytoscape-cola";
 
 cytoscape.use(cola);
