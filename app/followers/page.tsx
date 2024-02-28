@@ -3,7 +3,7 @@ import { Metadata } from "next";
 
 export async function generateMetadata(): Promise<Metadata> {
 
-    const imageUrl = `${process.env["HOST"]}/followers.jpeg`;
+    const imageUrl = `${process.env["HOST"]}/followers.png`;
   const fcMetadata: Record<string, string> = {
     "fc:frame": "vNext",
     "fc:frame:post_url": `${process.env["HOST"]}/api/followers/graph`,
