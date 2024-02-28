@@ -40,6 +40,7 @@ export async function getFollowersStats(fid: string): Promise<IFollower[]> {
         response = await fetchQueryWithPagination(query);
       } else {
         // Fetching subsequent pages
+        // @ts-ignore
         const nextPage = await response.getNextPage();
         if (nextPage) response = nextPage;
         else break; // Exit the loop if there's no next page
