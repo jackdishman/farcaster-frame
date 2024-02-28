@@ -4,7 +4,7 @@ import {
   getQuestions,
   updateSubmissionScore,
 } from "@/middleware/supabase";
-import { ISubmission } from "@/app/types/types";
+import { ISubmission } from "@/types/types";
 import { validateMessage } from "@/middleware/farcaster";
 import { getElapsedTimeString } from "@/middleware/helpers";
 

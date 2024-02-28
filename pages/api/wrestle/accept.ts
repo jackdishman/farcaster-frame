@@ -1,7 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { validateMessage } from "@/middleware/farcaster";
 import { getChallengeById, getChallenges, startOpponentWrestle } from "@/middleware/wrestle.ts";
-import { IMatch } from "@/app/types/wrestle";
+import { IMatch } from "@/types/wrestle";
 
 async function acceptChallenge(res: NextApiResponse, matchId: number) {
   

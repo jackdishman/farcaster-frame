@@ -1,5 +1,5 @@
 import { createClient } from "@supabase/supabase-js";
-import { IQuiz } from "../types/types";
+import { IQuiz } from "../../types/types";
 
 const supabase = createClient(
   process.env["SUPABASE_URL"] ?? ``,

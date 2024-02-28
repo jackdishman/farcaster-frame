@@ -1,7 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { validateMessage } from "@/middleware/farcaster";
 import { getChallenges } from "@/middleware/wrestle.ts";
-import { IMatch } from "@/app/types/wrestle";
+import { IMatch } from "@/types/wrestle";
 
 async function acceptChallenge(res: NextApiResponse, matches: IMatch[]) {
   const imageUrl = `${process.env["HOST"]}/api/wrestle/accept-challenge-image?challenger_fname=${matches[0].challenger_fname}`;
