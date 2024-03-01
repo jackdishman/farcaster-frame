@@ -39,11 +39,9 @@ export default async function handler(
         }
     }
 
-    followers.sort((a, b) => b.followerCount - a.followerCount);
-        // Calculate the total number of followers
-        const totalFollowers = followers.reduce((acc, follower) => acc + follower.followerCount, 0);
-        console.log(totalFollowers);
-    
+    // Calculate the total number of followers
+    const totalFollowers = followers.reduce((acc, follower) => acc + follower.followerCount, 0);
+    console.log(totalFollowers);
 
     const svg = await satori(
         <div

@@ -20,6 +20,7 @@ export async function getFollowers(
       .select("*")
       .eq("fid", fid)
       .single();
+      console.log(`fetched data`, data)
     if (error) throw error;
     if(!data || data?.length === 0) return { updated: false, followers: null };
     // check if the followers are up to date
@@ -40,7 +41,7 @@ export async function addFollowersEntry(fid: string, followers: IFollower[]) {
   try {
     const { data, error } = await supabase
       .from("followers")
-      .insert({ fid, updated_at: new Date(), followers });
+      .insert([{ fid, updated_at: new Date(), followers }]);
     if (error) throw error;
   } catch (error) {
     console.error("Error upserting followers", error);

@@ -7,19 +7,19 @@ import { addFollowersEntry, getFollowers, updateFollowersEntry } from '@/middlew
 export default async function Page({ params }: { params: { fid: string } }) {
     const {fid} = params;
     const followers:IFollower[] = [];
-    
+
     // check to see if already have followers
-    const res = await getFollowers(fid);
-    if(res?.updated && res?.followers !== null) {
+    const followerRes = await getFollowers(fid);
+    if(followerRes?.updated && followerRes?.followers !== null) {
         console.log(`using followers from db`)
-        followers.push(...res.followers);
+        followers.push(...followerRes.followers);
     } else {
         // fetch followers from Farcaster
         const stats = await getFollowersStats(fid);
         console.log(`fetch followers from farcaster`)
         followers.push(...stats);
         // update if already has followers
-        if(res?.followers !== null){
+        if(followerRes?.followers !== null){
             console.log(`update if already has followers`)
             await updateFollowersEntry(fid, stats);
         } else {
@@ -28,13 +28,15 @@ export default async function Page({ params }: { params: { fid: string } }) {
             await addFollowersEntry(fid, stats);
         }
     }
+
     followers.sort((a, b) => b.followerCount - a.followerCount);
+
     return (
         <div>
             <GraphComponent followers={followers} />
             <div>
             {followers.map((follower) => (
-                <div className='flex'>
+                <div className='flex' key={follower.userId}>
                     <span>{follower.profileName}</span>
                     <span className='mx-3'>{follower.userId}</span>
                     <span>{follower.followerCount}</span>
