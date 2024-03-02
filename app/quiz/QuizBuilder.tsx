@@ -26,6 +26,7 @@ export default function QuizBuilder() {
     title: null,
     proctor_fid: null,
   });
+  console.log(quiz);
   const [questions, setQuestions] = useState<IQuestionBuilder[]>([]);
 
   useEffect(() => {
