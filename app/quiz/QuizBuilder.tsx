@@ -1,21 +1,9 @@
 "use client";
 
-import React, { useState } from "react";
-
-interface IQuizBuilder {
-  title: string | null;
-  description: string | null;
-}
-
-interface IQuestionBuilder {
-  text: string;
-  option_1: string;
-  option_2: string;
-  option_3?: string;
-  option_4?: string;
-  answer: string;
-  explanation: string;
-}
+import { IQuestionBuilder, IQuizBuilder } from "@/types/types";
+import React, { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { useFarcaster } from "./FarcasterContext";
 
 // Explicitly define the option keys as part of IQuestionBuilder keys
 const optionKeys: (keyof IQuestionBuilder)[] = [
@@ -26,10 +14,18 @@ const optionKeys: (keyof IQuestionBuilder)[] = [
 ];
 
 export default function QuizBuilder() {
+  const { fid } = useFarcaster();
+  const router = useRouter();
+  useEffect(() => {
+    setQuiz({ ...quiz, proctor_fid: fid });
+    console.log(quiz);
+  }, [fid]);
   const [quiz, setQuiz] = useState<IQuizBuilder>({
     description: null,
     title: null,
+    proctor_fid: null,
   });
+  console.log(quiz);
   const [questions, setQuestions] = useState<IQuestionBuilder[]>([]);
 
   const handleQuestionChange = (
@@ -53,6 +49,30 @@ export default function QuizBuilder() {
     const newQuestions = [...questions];
     newQuestions.splice(index, 1);
     setQuestions(newQuestions);
+  };
+
+  const buildQuiz = async () => {
+    try {
+      const res = await fetch(
+        process.env.NEXT_PUBLIC_HOST + `/api/quiz/builder/uploadQuiz`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ quiz, questions }),
+        }
+      );
+      if (res.ok) {
+        const data = await res.json();
+        const quizId = data.id;
+        router.push(`/quiz/${quizId}`);
+      } else {
+        console.error("Error uploading quiz");
+      }
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   return (
@@ -189,7 +209,7 @@ export default function QuizBuilder() {
           <button
             type="button"
             className="mt-4 py-2 px-4 bg-green-500 text-white rounded hover:bg-green-700 transition duration-200"
-            onClick={() => console.log({ quiz, questions })}
+            onClick={buildQuiz}
           >
             Save Quiz
           </button>

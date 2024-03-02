@@ -1,5 +1,8 @@
 import { Metadata, ResolvingMetadata } from "next";
 import { getQuiz } from "@/middleware/supabase";
+import { getFnameByFid } from "@/middleware/airstack";
+import FarcasterWrapper from "../FarcasterWrapper";
+import Layout from "../Layout";
 
 type Props = {
   params: { id: string };
@@ -48,7 +51,6 @@ export async function generateMetadata(
 
 export default async function Page({ params }: { params: { id: string } }) {
   const quiz = await getQuiz(params.id);
-  console.log(quiz);
   if (!quiz) {
     return (
       <div>
@@ -56,30 +58,28 @@ export default async function Page({ params }: { params: { id: string } }) {
       </div>
     );
   }
+
+  const fname = quiz.proctor_fid ? await getFnameByFid(quiz.proctor_fid) : "";
+
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen py-2">
-      <main className="flex flex-col items-center justify-center flex-1 px-4 sm:px-20 text-center">
-        <h1 className="text-2xl">{quiz.title}</h1>
-        <p>{quiz.description}</p>
-        <img
-          src={
-            process.env[`NEXT_PUBLIC_HOST`] +
-            `/api/quiz/image?title=${quiz.title}&description=${quiz.description}`
-          }
-        />
-        <img
-          src={
-            process.env[`NEXT_PUBLIC_HOST`] +
-            `/api/quiz/image-question?text=${`In what year was the USS constitution created and for how long did it sail?`}&time=12mins&progress=${"1/10"}`
-          }
-        />
-        <img
-          src={
-            process.env[`NEXT_PUBLIC_HOST`] +
-            `/api/quiz/image-result?explanation=${`In what year was the USS constitution created and for how long did it sail?`}&time=12mins&progress=${"1/10"}&correct=${true}`
-          }
-        />
-      </main>
-    </div>
+    <FarcasterWrapper>
+      <Layout>
+        <div className="flex flex-col items-center justify-center min-h-screen py-2">
+          <main className="flex flex-col items-center justify-center flex-1 px-4 sm:px-20 text-center">
+            <h1 className="text-4xl">{quiz.title}</h1>
+            <h6 className="text-xl">{quiz.description}</h6>
+            <p>
+              by {fname} ({quiz.proctor_fid})
+            </p>
+            <img
+              src={
+                process.env[`NEXT_PUBLIC_HOST`] +
+                `/api/quiz/image?title=${quiz.title}&description=${quiz.description}`
+              }
+            />
+          </main>
+        </div>
+      </Layout>
+    </FarcasterWrapper>
   );
 }
