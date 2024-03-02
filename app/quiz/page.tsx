@@ -1,8 +1,12 @@
 import { createClient } from "@supabase/supabase-js";
 import { IQuiz } from "../../types/types";
 import FarcasterWrapper from "./FarcasterWrapper";
+<<<<<<< HEAD
 import PageContainer from "./PageContainer";
 import { Metadata } from "next";
+=======
+import QuizBuilder from "./QuizBuilder";
+>>>>>>> 740a60d (feat: add quiz builder template)
 
 const supabase = createClient(
   process.env["SUPABASE_URL"] ?? ``,
