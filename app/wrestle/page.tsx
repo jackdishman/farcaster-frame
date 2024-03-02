@@ -7,10 +7,10 @@ type Props = {
 
 export async function generateMetadata(): Promise<Metadata> {
 
-    const imageUrl = `${process.env["HOST"]}/wrestle.jpeg`;
+    const imageUrl = `${process.env["NEXT_PUBLIC_HOST"]}/wrestle.jpeg`;
   const fcMetadata: Record<string, string> = {
     "fc:frame": "vNext",
-    "fc:frame:post_url": `${process.env["HOST"]}/api/wrestle/start`,
+    "fc:frame:post_url": `${process.env["NEXT_PUBLIC_HOST"]}/api/wrestle/start`,
     "fc:frame:image": imageUrl,
     "fc:frame:button:1": `Wrestle`,
   };
@@ -25,7 +25,7 @@ export async function generateMetadata(): Promise<Metadata> {
     other: {
       ...fcMetadata,
     },
-    metadataBase: new URL(process.env["HOST"] || ""),
+    metadataBase: new URL(process.env["NEXT_PUBLIC_HOST"] || ""),
   };
 }
 
@@ -36,7 +36,7 @@ export default async function Page({ params }: { params: { id: string } }) {
         <h1 className="text-2xl">WRESTLE PAGE</h1>
         <img
           src={
-            process.env[`HOST`] +
+            process.env[`NEXT_PUBLIC_HOST`] +
             `/api/wrestle/completed-matches-image`
           }
         />

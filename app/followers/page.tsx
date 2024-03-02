@@ -3,10 +3,10 @@ import { Metadata } from "next";
 
 export async function generateMetadata(): Promise<Metadata> {
 
-    const imageUrl = `${process.env["HOST"]}/followers.png`;
+    const imageUrl = `${process.env["NEXT_PUBLIC_HOST"]}/followers.png`;
   const fcMetadata: Record<string, string> = {
     "fc:frame": "vNext",
-    "fc:frame:post_url": `${process.env["HOST"]}/api/followers/graph`,
+    "fc:frame:post_url": `${process.env["NEXT_PUBLIC_HOST"]}/api/followers/graph`,
     "fc:frame:image": imageUrl,
     "fc:frame:button:1": `Generate your Graph`,
   };
@@ -21,7 +21,7 @@ export async function generateMetadata(): Promise<Metadata> {
     other: {
       ...fcMetadata,
     },
-    metadataBase: new URL(process.env["HOST"] || ""),
+    metadataBase: new URL(process.env["NEXT_PUBLIC_HOST"] || ""),
   };
 }
 

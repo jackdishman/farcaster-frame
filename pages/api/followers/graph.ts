@@ -2,7 +2,7 @@ import { validateMessage } from "@/middleware/farcaster";
 import type { NextApiRequest, NextApiResponse } from "next";
 
 async function sendChart(res: NextApiResponse, fid: string) {
-    const imageUrl = `${process.env["HOST"]}/api/followers/graph-image?fid=${fid}`;
+    const imageUrl = `${process.env["NEXT_PUBLIC_HOST"]}/api/followers/graph-image?fid=${fid}`;
     res.setHeader("Content-Type", "text/html");
     res.status(200).send(`
             <!DOCTYPE html>
@@ -16,7 +16,7 @@ async function sendChart(res: NextApiResponse, fid: string) {
 
                 <meta property="fc:frame:button:1" content="View Graph" />
                 <meta property="fc:frame:button:1:action" content="link" />
-                <meta property="fc:frame:button:1:target" content="${process.env.HOST}/followers/${fid}" />  
+                <meta property="fc:frame:button:1:target" content="${process.env.NEXT_PUBLIC_HOST}/followers/${fid}" />  
       
                 </head>
               <body>

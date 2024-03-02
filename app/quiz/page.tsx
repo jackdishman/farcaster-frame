@@ -1,5 +1,7 @@
 import { createClient } from "@supabase/supabase-js";
 import { IQuiz } from "../../types/types";
+import FarcasterWrapper from "./FarcasterWrapper";
+import QuizBuilder from "./QuizBuilder";
 
 const supabase = createClient(
   process.env["SUPABASE_URL"] ?? ``,
@@ -20,14 +22,17 @@ export default async function Page() {
   const quizzes = await getQuizzes();
   return (
     <div>
-      <h1 className="text-2xl">Quizzes</h1>
-      {quizzes &&
-        quizzes.map((quiz: IQuiz) => (
-          <ul key={quiz.id}>
-            <li>{quiz.title}</li>
-            <li>{quiz.description}</li>
-          </ul>
-        ))}
+      <FarcasterWrapper>
+        <h1 className="text-2xl">Quizzes</h1>
+        <QuizBuilder />
+        {quizzes &&
+          quizzes.map((quiz: IQuiz) => (
+            <ul key={quiz.id}>
+              <li>{quiz.title}</li>
+              <li>{quiz.description}</li>
+            </ul>
+          ))}
+      </FarcasterWrapper>
     </div>
   );
 }

@@ -2,7 +2,7 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import { validateMessage } from "@/middleware/farcaster";
 
 async function sendResults(res: NextApiResponse) {
-  const imageUrl = `${process.env["HOST"]}/api/wrestle/completed-matches-image`;
+  const imageUrl = `${process.env["NEXT_PUBLIC_HOST"]}/api/wrestle/completed-matches-image`;
   console.log("image url", imageUrl);
   res.setHeader("Content-Type", "text/html");
   res.status(200).send(`
@@ -15,7 +15,7 @@ async function sendResults(res: NextApiResponse) {
               <meta name="fc:frame" content="vNext">
               <meta name="fc:frame:image" content="${imageUrl}">
 
-              <meta name="fc:frame:post_url" content="${process.env["HOST"]}/api/wrestle/start">
+              <meta name="fc:frame:post_url" content="${process.env["NEXT_PUBLIC_HOST"]}/api/wrestle/start">
               <meta name="fc:frame:button:1" content="Return">
 
               <meta property="fc:frame:button:2" content="Give feedback" />

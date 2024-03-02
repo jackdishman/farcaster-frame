@@ -25,7 +25,7 @@ async function sendWrestle(
 
   // send results page if the match is over
   if (timeRemaining <= 0) {
-    const imageUrl = `${process.env["HOST"]}/wrestle.jpeg`;
+    const imageUrl = `${process.env["NEXT_PUBLIC_HOST"]}/wrestle.jpeg`;
     res.setHeader("Content-Type", "text/html");
     res.status(200).send(`
     <!DOCTYPE html>
@@ -37,7 +37,7 @@ async function sendWrestle(
         <meta property="og:image" content="${imageUrl}">
         <meta name="fc:frame:image" content="${imageUrl}">
 
-        <meta name="fc:frame:post_url" content="${process.env["HOST"]}/api/wrestle/results?matchId=${matchId}">
+        <meta name="fc:frame:post_url" content="${process.env["NEXT_PUBLIC_HOST"]}/api/wrestle/results?matchId=${matchId}">
         <meta name="fc:frame:button:1" content="DONE">
       
         </head>
@@ -49,7 +49,7 @@ async function sendWrestle(
     return;
   }
 
-  const imageUrl = `${process.env["HOST"]}/api/wrestle/active-match?opponent_fname=${opponent_fname}&challenger_fname=${challenger_fname}&opponent_score=${opponent_score}&challenger_score=${challenger_score}&time_left=${timeLeft}`;
+  const imageUrl = `${process.env["NEXT_PUBLIC_HOST"]}/api/wrestle/active-match?opponent_fname=${opponent_fname}&challenger_fname=${challenger_fname}&opponent_score=${opponent_score}&challenger_score=${challenger_score}&time_left=${timeLeft}`;
   res.setHeader("Content-Type", "text/html");
   res.status(200).send(`
   <!DOCTYPE html>
@@ -61,7 +61,7 @@ async function sendWrestle(
       <meta property="og:image" content="${imageUrl}">
       <meta name="fc:frame:image" content="${imageUrl}">
 
-      <meta name="fc:frame:post_url" content="${process.env["HOST"]}/api/wrestle/push?matchId=${matchId}">
+      <meta name="fc:frame:post_url" content="${process.env["NEXT_PUBLIC_HOST"]}/api/wrestle/push?matchId=${matchId}">
       <meta name="fc:frame:button:1" content="WRESTLE 💪">
     
       </head>

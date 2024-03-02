@@ -5,7 +5,7 @@ import { IMatch } from "@/types/wrestle";
 
 async function acceptChallenge(res: NextApiResponse, matchId: number) {
   
-  const imageUrl = `${process.env["HOST"]}/wrestle.jpeg`;
+  const imageUrl = `${process.env["NEXT_PUBLIC_HOST"]}/wrestle.jpeg`;
   res.setHeader("Content-Type", "text/html");
   res.status(200).send(`
           <!DOCTYPE html>
@@ -17,7 +17,7 @@ async function acceptChallenge(res: NextApiResponse, matchId: number) {
               <meta property="og:image" content="${imageUrl}">
               <meta name="fc:frame:image" content="${imageUrl}">
 
-              <meta name="fc:frame:post_url" content="${process.env["HOST"]}/api/wrestle/push?matchId=${matchId}">
+              <meta name="fc:frame:post_url" content="${process.env["NEXT_PUBLIC_HOST"]}/api/wrestle/push?matchId=${matchId}">
               <meta name="fc:frame:button:1" content="Accept Challenge">
   
               </head>

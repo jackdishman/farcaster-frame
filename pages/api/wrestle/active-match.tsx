@@ -73,7 +73,7 @@ export default async function handler(
             }}
           >
             <h2 style={{ textAlign: "center", color: "#fff" }}>{opponent_score}</h2>
-            <img src={`${process.env.HOST}/wrestle.jpeg`} style={{width: "120px", height: "auto"}} />
+            <img src={`${process.env.NEXT_PUBLIC_HOST}/wrestle.jpeg`} style={{width: "120px", height: "auto"}} />
             <h2 style={{ textAlign: "center", color: "#fff" }}>{challenger_score}</h2>
           </div>
         </div>

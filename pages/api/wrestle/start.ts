@@ -4,7 +4,7 @@ import { getChallenges } from "@/middleware/wrestle.ts";
 import { IMatch } from "@/types/wrestle";
 
 async function acceptChallenge(res: NextApiResponse, matches: IMatch[]) {
-  const imageUrl = `${process.env["HOST"]}/api/wrestle/accept-challenge-image?challenger_fname=${matches[0].challenger_fname}`;
+  const imageUrl = `${process.env["NEXT_PUBLIC_HOST"]}/api/wrestle/accept-challenge-image?challenger_fname=${matches[0].challenger_fname}`;
   res.setHeader("Content-Type", "text/html");
   res.status(200).send(`
           <!DOCTYPE html>
@@ -16,7 +16,7 @@ async function acceptChallenge(res: NextApiResponse, matches: IMatch[]) {
               <meta property="og:image" content="${imageUrl}">
               <meta name="fc:frame:image" content="${imageUrl}">
 
-              <meta name="fc:frame:post_url" content="${process.env["HOST"]}/api/wrestle/accept?matchId=${matches[0].id}">
+              <meta name="fc:frame:post_url" content="${process.env["NEXT_PUBLIC_HOST"]}/api/wrestle/accept?matchId=${matches[0].id}">
               <meta name="fc:frame:button:1" content="Accept Challenge">
   
               </head>
@@ -28,7 +28,7 @@ async function acceptChallenge(res: NextApiResponse, matches: IMatch[]) {
 }
 
 async function sendRequestForm(res: NextApiResponse) {
-  const imageUrl = `${process.env["HOST"]}/wrestle.jpeg`;
+  const imageUrl = `${process.env["NEXT_PUBLIC_HOST"]}/wrestle.jpeg`;
   res.setHeader("Content-Type", "text/html");
   res.status(200).send(`
           <!DOCTYPE html>
@@ -40,7 +40,7 @@ async function sendRequestForm(res: NextApiResponse) {
               <meta property="og:image" content="${imageUrl}">
               <meta name="fc:frame:image" content="${imageUrl}">
 
-              <meta name="fc:frame:post_url" content="${process.env["HOST"]}/api/wrestle/send-challenge">
+              <meta name="fc:frame:post_url" content="${process.env["NEXT_PUBLIC_HOST"]}/api/wrestle/send-challenge">
               <meta name="fc:frame:input:text" content="Enter username (ex: @dish)">
 
               <meta name="fc:frame:button:1" content="Challenge">

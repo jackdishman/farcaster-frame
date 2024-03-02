@@ -6,7 +6,7 @@ async function sendResults(
   fid: string,
     quizId: string,
 ) {
-  const imageUrl = `${process.env["HOST"]}/api/quiz/image-leaderboard?fid=${fid}&quiz_id=${quizId}`;
+  const imageUrl = `${process.env["NEXT_PUBLIC_HOST"]}/api/quiz/image-leaderboard?fid=${fid}&quiz_id=${quizId}`;
   console.log("image url", imageUrl);
   res.setHeader("Content-Type", "text/html");
   res.status(200).send(`

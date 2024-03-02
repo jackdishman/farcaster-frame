@@ -30,7 +30,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 // Also validate the frame url matches the expected url
                 let urlBuffer = validatedMessage?.data?.frameActionBody?.url || [];
                 const urlString = Buffer.from(urlBuffer).toString('utf-8');
-                if (validatedMessage && !urlString.startsWith(process.env['HOST'] || '')) {
+                if (validatedMessage && !urlString.startsWith(process.env['NEXT_PUBLIC_HOST'] || '')) {
                     return res.status(400).send(`Invalid frame url: ${urlBuffer}`);
                 }
             } catch (e)  {
@@ -49,7 +49,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
             // Clicked create poll
             if ((results || voted) && buttonId === 2) {
-                return res.status(302).setHeader('Location', `${process.env['HOST']}`).send('Redirecting to create poll');
+                return res.status(302).setHeader('Location', `${process.env['NEXT_PUBLIC_HOST']}`).send('Redirecting to create poll');
             }
 
             const voteExists = await kv.sismember(`poll:${pollId}:voted`, fid)
@@ -69,7 +69,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             if (!poll) {
                 return res.status(400).send('Missing poll ID');
             }
-            const imageUrl = `${process.env['HOST']}/api/image?id=${poll.id}&results=${results ? 'false': 'true'}&date=${Date.now()}${ fid > 0 ? `&fid=${fid}` : '' }`;
+            const imageUrl = `${process.env['NEXT_PUBLIC_HOST']}/api/image?id=${poll.id}&results=${results ? 'false': 'true'}&date=${Date.now()}${ fid > 0 ? `&fid=${fid}` : '' }`;
             let button1Text = "View Results";
             if (!voted && !results) {
                 button1Text = "Back"
@@ -90,7 +90,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           <meta property="og:image" content="${imageUrl}">
           <meta name="fc:frame" content="vNext">
           <meta name="fc:frame:image" content="${imageUrl}">
-          <meta name="fc:frame:post_url" content="${process.env['HOST']}/api/vote?id=${poll.id}&voted=true&results=${results ? 'false' : 'true'}">
+          <meta name="fc:frame:post_url" content="${process.env['NEXT_PUBLIC_HOST']}/api/vote?id=${poll.id}&voted=true&results=${results ? 'false' : 'true'}">
           <meta name="fc:frame:button:1" content="${button1Text}">
           <meta name="fc:frame:button:2" content="Create your poll">
           <meta name="fc:frame:button:2:action" content="post_redirect">

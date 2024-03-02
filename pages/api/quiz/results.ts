@@ -14,7 +14,7 @@ async function sendResults(
   quizId: string,
   elapsedTime: string
 ) {
-  const imageUrl = `${process.env["HOST"]}/api/quiz/image-question?text=${
+  const imageUrl = `${process.env["NEXT_PUBLIC_HOST"]}/api/quiz/image-question?text=${
     "You scored " + percentage + " percent correct"
   }&time=${elapsedTime}`;
   res.setHeader("Content-Type", "text/html");
@@ -28,7 +28,7 @@ async function sendResults(
               <meta name="fc:frame" content="vNext">
               <meta name="fc:frame:image" content="${imageUrl}">
 
-              <meta name="fc:frame:post_url" content="${process.env["HOST"]}/api/quiz/leaderboard?quiz_id=${quizId}">
+              <meta name="fc:frame:post_url" content="${process.env["NEXT_PUBLIC_HOST"]}/api/quiz/leaderboard?quiz_id=${quizId}">
               <meta name="fc:frame:button:1" content="Leaderboard">
 
 

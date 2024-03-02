@@ -20,14 +20,14 @@ export async function generateMetadata(
         title: "Quiz not found",
         description: "Quiz not found",
       },
-      metadataBase: new URL(process.env["HOST"] || ""),
+      metadataBase: new URL(process.env["NEXT_PUBLIC_HOST"] || ""),
     };
   }
 
-  const imageUrl = `${process.env["HOST"]}/api/quiz/image?title=${quiz.title}&description=${quiz.description}`;
+  const imageUrl = `${process.env["NEXT_PUBLIC_HOST"]}/api/quiz/image?title=${quiz.title}&description=${quiz.description}`;
   const fcMetadata: Record<string, string> = {
     "fc:frame": "vNext",
-    "fc:frame:post_url": `${process.env["HOST"]}/api/quiz/question?quiz_id=${id}&question_id=${quiz.first_question_id}`,
+    "fc:frame:post_url": `${process.env["NEXT_PUBLIC_HOST"]}/api/quiz/question?quiz_id=${id}&question_id=${quiz.first_question_id}`,
     "fc:frame:image": imageUrl,
     "fc:frame:button:1": `Start ${quiz.title}`,
   };
@@ -42,7 +42,7 @@ export async function generateMetadata(
     other: {
       ...fcMetadata,
     },
-    metadataBase: new URL(process.env["HOST"] || ""),
+    metadataBase: new URL(process.env["NEXT_PUBLIC_HOST"] || ""),
   };
 }
 
@@ -63,19 +63,19 @@ export default async function Page({ params }: { params: { id: string } }) {
         <p>{quiz.description}</p>
         <img
           src={
-            process.env[`HOST`] +
+            process.env[`NEXT_PUBLIC_HOST`] +
             `/api/quiz/image?title=${quiz.title}&description=${quiz.description}`
           }
         />
         <img
           src={
-            process.env[`HOST`] +
+            process.env[`NEXT_PUBLIC_HOST`] +
             `/api/quiz/image-question?text=${`In what year was the USS constitution created and for how long did it sail?`}&time=12mins&progress=${"1/10"}`
           }
         />
         <img
           src={
-            process.env[`HOST`] +
+            process.env[`NEXT_PUBLIC_HOST`] +
             `/api/quiz/image-result?explanation=${`In what year was the USS constitution created and for how long did it sail?`}&time=12mins&progress=${"1/10"}&correct=${true}`
           }
         />

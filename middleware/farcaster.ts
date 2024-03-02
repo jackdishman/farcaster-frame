@@ -23,7 +23,7 @@ export async function validateMessage(req: NextApiRequest, res: NextApiResponse)
       const urlString = Buffer.from(urlBuffer).toString("utf-8");
       if (
         validatedMessage &&
-        !urlString.startsWith(process.env["HOST"] || "")
+        !urlString.startsWith(process.env["NEXT_PUBLIC_HOST"] || "")
       ) {
         res.status(400).send(`Invalid frame url: ${urlBuffer}`)
         return { validatedMessage, fid: 0, buttonId: 0, inputText: "" };

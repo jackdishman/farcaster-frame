@@ -16,7 +16,7 @@ async function sendResults(
   progress: string
 ) {
   console.log(`sending results`)
-  const imageUrl = `${process.env["HOST"]}/api/quiz/image-question?text=${
+  const imageUrl = `${process.env["NEXT_PUBLIC_HOST"]}/api/quiz/image-question?text=${
     "You scored " + percentage + " percent correct"
   }&time=${elapsedTime}&progress=${progress}`;
   res.setHeader("Content-Type", "text/html");
@@ -29,7 +29,7 @@ async function sendResults(
               <meta property="og:image" content="${imageUrl}">
               <meta name="fc:frame" content="vNext">
               <meta name="fc:frame:image" content="${imageUrl}">
-              <meta name="fc:frame:post_url" content="${process.env["HOST"]}/api/quiz/results?quiz_id=${quizId}">
+              <meta name="fc:frame:post_url" content="${process.env["NEXT_PUBLIC_HOST"]}/api/quiz/results?quiz_id=${quizId}">
   }">
               <meta name="fc:frame:button:1" content="Done">
             </head>
@@ -50,8 +50,8 @@ async function skipQuestionResponse(
 ) {
   console.log(`skipping question response`)
   const text = `Question: ${question.text}, you answered ${previousAnswer.isCorrect ? "correctly" : "incorrectly"}`;
-  const imageUrl = `${process.env["HOST"]}/api/quiz/image-question?text=${text}&time=${elapsedTime}&progress=${progress}`;
-  const nextQuestionLink = `${process.env["HOST"]}/api/quiz/question?quiz_id=${quizId}&question_id=${question.next_question_id}`;
+  const imageUrl = `${process.env["NEXT_PUBLIC_HOST"]}/api/quiz/image-question?text=${text}&time=${elapsedTime}&progress=${progress}`;
+  const nextQuestionLink = `${process.env["NEXT_PUBLIC_HOST"]}/api/quiz/question?quiz_id=${quizId}&question_id=${question.next_question_id}`;
   res.setHeader("Content-Type", "text/html");
   res.status(200).send(`
         <!DOCTYPE html>
@@ -151,7 +151,7 @@ export default async function handler(
       console.log(`should not get here on repeat`)
 
       // send question
-      const imageUrl = `${process.env["HOST"]}/api/quiz/image-question?text=${question.text}&time=${elapsedTime}&progress=${progress}`;
+      const imageUrl = `${process.env["NEXT_PUBLIC_HOST"]}/api/quiz/image-question?text=${question.text}&time=${elapsedTime}&progress=${progress}`;
       res.setHeader("Content-Type", "text/html");
       res.status(200).send(`
                 <!DOCTYPE html>
@@ -163,7 +163,7 @@ export default async function handler(
                     <meta name="fc:frame" content="vNext">
                     <meta name="fc:frame:image" content="${imageUrl}">
                     <meta name="fc:frame:post_url" content="${
-                      process.env["HOST"]
+                      process.env["NEXT_PUBLIC_HOST"]
                     }/api/quiz/answer?quiz_id=${quizId}&question_id=${
         question.id
       }">
