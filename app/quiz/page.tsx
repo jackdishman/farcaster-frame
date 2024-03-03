@@ -27,8 +27,7 @@ export async function generateMetadata(): Promise<Metadata> {
     "fc:frame:button:1:target": `${process.env["NEXT_PUBLIC_HOST"]}/quiz`,
 
     "fc:frame:button:2": `Take Random Quiz`,
-    "fc:frame:button:2:action": `link`,
-    "fc:frame:button:2:target": `${process.env["NEXT_PUBLIC_HOST"]}/quiz/${randomId}`,
+    "fc:frame:button:2:post_url": `${process.env["NEXT_PUBLIC_HOST"]}/quiz/${randomId}`,
   };
 
   return {
