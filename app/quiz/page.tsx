@@ -2,16 +2,14 @@ import { createClient } from "@supabase/supabase-js";
 import { IQuiz } from "../../types/types";
 import FarcasterWrapper from "./FarcasterWrapper";
 import PageContainer from "./PageContainer";
-import { Metadata, ResolvingMetadata } from "next";
+import { Metadata } from "next";
 
 const supabase = createClient(
   process.env["SUPABASE_URL"] ?? ``,
   process.env["SUPABASE_ANON_KEY"] ?? ``
 );
 
-export async function generateMetadata(
-  parent: ResolvingMetadata
-): Promise<Metadata> {
+export async function generateMetadata(): Promise<Metadata> {
   const quizzes = await getQuizzes();
   // get quiz id of randomly selected quiz
   const randomId = quizzes?.[0]?.id;
