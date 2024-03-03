@@ -5,6 +5,7 @@ export interface IQuiz {
   title: string | null;
   first_question_id: number | null;
   proctor_fid: string | null;
+  uuid: string | null;
 }
 
 export interface ISubmission {

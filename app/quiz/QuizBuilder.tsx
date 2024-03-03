@@ -16,17 +16,24 @@ const optionKeys: (keyof IQuestionBuilder)[] = [
 export default function QuizBuilder() {
   const { fid } = useFarcaster();
   const router = useRouter();
+  const [disabled, setDisabled] = useState(false);
   useEffect(() => {
     setQuiz({ ...quiz, proctor_fid: fid });
-    console.log(quiz);
   }, [fid]);
   const [quiz, setQuiz] = useState<IQuizBuilder>({
     description: null,
     title: null,
     proctor_fid: null,
   });
-  console.log(quiz);
   const [questions, setQuestions] = useState<IQuestionBuilder[]>([]);
+
+  useEffect(() => {
+    if (!quiz.title || !quiz.description || questions.length < 1) {
+      setDisabled(true);
+    } else {
+      setDisabled(false);
+    }
+  }, [quiz.title, quiz.description, questions.length]);
 
   const handleQuestionChange = (
     index: number,
@@ -208,8 +215,9 @@ export default function QuizBuilder() {
           {/* save button */}
           <button
             type="button"
-            className="mt-4 py-2 px-4 bg-green-500 text-white rounded hover:bg-green-700 transition duration-200"
+            className={`mt-4 py-2 px-4 bg-green-500 text-white rounded hover:bg-green-700 transition duration-200 ${disabled && "opacity-50 cursor-not-allowed"}`}
             onClick={buildQuiz}
+            disabled={!quiz.title || !quiz.description || questions.length < 1}
           >
             Save Quiz
           </button>
