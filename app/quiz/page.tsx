@@ -11,8 +11,21 @@ const supabase = createClient(
 
 export async function generateMetadata(): Promise<Metadata> {
   const quizzes = await getQuizzes();
-  // get quiz id of randomly selected quiz
-  const randomId = quizzes?.[0]?.id;
+  // randomly select a quiz to use for the frame
+  if (!quizzes) {
+    return {
+      title: "No quizzes found",
+      openGraph: {
+        title: "No quizzes found",
+        description: "No quizzes found",
+      },
+      metadataBase: new URL(process.env["NEXT_PUBLIC_HOST"] || ""),
+    };
+  }
+  const randomindex = Math.floor(Math.random() * quizzes?.length);
+  const randomId = quizzes?.[randomindex]?.id;
+
+  // const randomId = quizzes?.[0]?.id;
 
   const title = "Cast-A-Quiz";
   const description = "Farcaster Quiz Frame Builder & Explorer";
