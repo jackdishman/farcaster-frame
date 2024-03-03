@@ -15,7 +15,7 @@ async function sendResults(
   elapsedTime: string,
   progress: string
 ) {
-  console.log(`sending results`)
+  console.log(`sending results`);
   const imageUrl = `${process.env["NEXT_PUBLIC_HOST"]}/api/quiz/image-question?text=${
     "You scored " + percentage + " percent correct"
   }&time=${elapsedTime}&progress=${progress}`;
@@ -48,7 +48,7 @@ async function skipQuestionResponse(
   elapsedTime: string,
   res: NextApiResponse
 ) {
-  console.log(`skipping question response`)
+  console.log(`skipping question response`);
   const text = `Question: ${question.text}, you answered ${previousAnswer.isCorrect ? "correctly" : "incorrectly"}`;
   const imageUrl = `${process.env["NEXT_PUBLIC_HOST"]}/api/quiz/image-question?text=${text}&time=${elapsedTime}&progress=${progress}`;
   const nextQuestionLink = `${process.env["NEXT_PUBLIC_HOST"]}/api/quiz/question?quiz_id=${quizId}&question_id=${question.next_question_id}`;
@@ -113,7 +113,7 @@ export default async function handler(
 
       // if already completed, return results
       if (submission && submission.score) {
-        console.log(`submission score`, submission.score)
+        console.log(`submission score`, submission.score);
         sendResults(res, submission.score, quizId, elapsedTime, progress);
         return;
       }
@@ -134,8 +134,17 @@ export default async function handler(
         ? submission.answers.find((a) => a.question_id === questionId) || null
         : null;
       if (submission.answers && previousAnswer) {
-        console.log(`skipping question response because already answered`)
-        console.log(previousAnswer)
+        // check if last question
+        if (!question.next_question_id) {
+          if (!submission.score) {
+            return res.status(500).send("Error fetching questions");
+          }
+          sendResults(res, submission.score, quizId, elapsedTime, progress);
+          return;
+        }
+        console.log(`skipping question response because already answered`);
+        console.log(previousAnswer);
+        // skip question
         skipQuestionResponse(
           previousAnswer,
           question,
@@ -144,11 +153,11 @@ export default async function handler(
           elapsedTime,
           res
         );
-        return
+        return;
       }
-      console.log(`previousAnswer`, previousAnswer)
-      console.log(`submission.score`, submission.score)
-      console.log(`should not get here on repeat`)
+      console.log(`previousAnswer`, previousAnswer);
+      console.log(`submission.score`, submission.score);
+      console.log(`should not get here on repeat`);
 
       // send question
       const imageUrl = `${process.env["NEXT_PUBLIC_HOST"]}/api/quiz/image-question?text=${question.text}&time=${elapsedTime}&progress=${progress}`;
@@ -165,8 +174,8 @@ export default async function handler(
                     <meta name="fc:frame:post_url" content="${
                       process.env["NEXT_PUBLIC_HOST"]
                     }/api/quiz/answer?quiz_id=${quizId}&question_id=${
-        question.id
-      }">
+                      question.id
+                    }">
                     <meta name="fc:frame:button:1" content="${
                       question.option_1
                     }">
