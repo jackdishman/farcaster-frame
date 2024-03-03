@@ -4,6 +4,7 @@ import { IQuestionBuilder, IQuizBuilder } from "@/types/types";
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useFarcaster } from "./FarcasterContext";
+import { toast } from "react-toastify";
 
 // Explicitly define the option keys as part of IQuestionBuilder keys
 const optionKeys: (keyof IQuestionBuilder)[] = [
@@ -59,6 +60,14 @@ export default function QuizBuilder() {
   };
 
   const buildQuiz = async () => {
+    if (disabled) {
+      toast.error("Title, description, and at least one question is required.");
+      return;
+    }
+    if (!quiz.proctor_fid) {
+      toast.error("Please sign into Farcaster to create a quiz.");
+      return;
+    }
     try {
       const res = await fetch(
         process.env.NEXT_PUBLIC_HOST + `/api/quiz/builder/uploadQuiz`,

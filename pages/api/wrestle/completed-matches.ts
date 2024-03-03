@@ -22,12 +22,20 @@ async function sendResults(res: NextApiResponse) {
               <meta property="fc:frame:button:2:action" content="link" />
               <meta property="fc:frame:button:2:target" content="https://warpcast.com/dish" />  
 
+              <meta property="fc:frame:button:2" content="Source Code" />
+              <meta property="fc:frame:button:2:action" content="link" />
+              <meta property="fc:frame:button:2:target" content="https://github.com/jackdishman/farcaster-frame" />  
+
+              <meta property="fc:frame:button:3" content="Create Quiz & Stats" />
+              <meta property="fc:frame:button:3:action" content="link" />
+              <meta property="fc:frame:button:3:target" content="${process.env.NEXT_PUBLIC_HOST}/quiz" />
+
               </head>
             <body>
             </body>
           </html>
         `);
-        return
+  return;
 }
 
 export default async function handler(
@@ -37,9 +45,9 @@ export default async function handler(
   if (req.method === "POST") {
     try {
       // validate message
-    //   await validateMessage(req, res);
+      //   await validateMessage(req, res);
       await sendResults(res);
-      return
+      return;
     } catch (error) {
       console.error(error);
       res.status(500).send("Error generating image");
