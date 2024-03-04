@@ -13,7 +13,7 @@ export default function PageContainer(props: IProps) {
   const { quizzes } = props;
   const [toggle, setToggle] = React.useState(false);
   return (
-    <div className="w-96">
+    <div className="w-96 px-4">
       <TabToggle setToggle={setToggle} toggle={toggle} />
       {toggle ? <QuizList quizzes={quizzes} /> : <QuizBuilder />}
     </div>
