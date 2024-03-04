@@ -20,9 +20,9 @@ export async function getFollowers(
       .select("*")
       .eq("fid", fid)
       .single();
-      console.log(`fetched data`, data)
+    console.log(`fetched data`, data);
     if (error) throw error;
-    if(!data || data?.length === 0) return { updated: false, followers: null };
+    if (!data || data?.length === 0) return { updated: false, followers: null };
     // check if the followers are up to date
     const lastUpdated = new Date(data?.[`updated_at`]);
     const now = new Date();

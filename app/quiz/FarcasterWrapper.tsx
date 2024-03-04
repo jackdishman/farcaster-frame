@@ -35,9 +35,9 @@ function SignInHandler({ children }: { children: React.ReactNode }) {
       <header className="sticky top-0">
         <Link
           href={process.env["NEXT_PUBLIC_HOST"] + `/quiz`}
-          className="text-2xl font-sans font-bold absolute top-0 left-0 m-5 cursor-pointer underline-offset-4 text-[#7c65c1] hover:underline hover:underline-offset-5"
+          className="text-lg sm:text-2xl font-sans font-bold absolute top-0 left-0 m-5 cursor-pointer underline-offset-4 text-[#7c65c1] hover:underline hover:underline-offset-5"
         >
-          Farcaster Quiz Frame Builder & Explorer
+          Farcaster Quiz Frame
         </Link>
         <div className="absolute top-0 right-0 m-5">
           <SignInButton
@@ -49,7 +49,7 @@ function SignInHandler({ children }: { children: React.ReactNode }) {
           />
         </div>
       </header>
-      <main className="pt-16">{children}</main>
+      <main className="pt-24 sm:pt-16">{children}</main>
     </>
   );
 }

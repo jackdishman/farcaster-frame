@@ -4,7 +4,11 @@ import satori from "satori";
 import { join } from "path";
 import * as fs from "fs";
 import { getFollowersStats } from "@/middleware/caststats";
-import { addFollowersEntry, getFollowers, updateFollowersEntry } from "@/middleware/caststats/supabase";
+import {
+  addFollowersEntry,
+  getFollowers,
+  updateFollowersEntry,
+} from "@/middleware/caststats/supabase";
 import { IFollower } from "@/types/followers";
 
 const fontPath = join(process.cwd(), "Roboto-Regular.ttf");
@@ -16,35 +20,38 @@ export default async function handler(
 ) {
   try {
     const fid = req.query["fid"] as string;
-    const followers:IFollower[] = [];
+    const followers: IFollower[] = [];
 
     // check to see if already have followers
     const followerRes = await getFollowers(fid);
-    if(followerRes?.updated && followerRes?.followers !== null) {
-        console.log(`using followers from db`)
-        followers.push(...followerRes.followers);
+    if (followerRes?.updated && followerRes?.followers !== null) {
+      console.log(`using followers from db`);
+      followers.push(...followerRes.followers);
     } else {
-        // fetch followers from Farcaster
-        const stats = await getFollowersStats(fid);
-        console.log(`fetch followers from farcaster`)
-        followers.push(...stats);
-        // update if already has followers
-        if(followerRes?.followers !== null){
-            console.log(`update if already has followers`)
-            await updateFollowersEntry(fid, stats);
-        } else {
-            // add new entry
-            console.log(`add new entry`)
-            await addFollowersEntry(fid, stats);
-        }
+      // fetch followers from Farcaster
+      const stats = await getFollowersStats(fid);
+      console.log(`fetch followers from farcaster`);
+      followers.push(...stats);
+      // update if already has followers
+      if (followerRes?.followers !== null) {
+        console.log(`update if already has followers`);
+        await updateFollowersEntry(fid, stats);
+      } else {
+        // add new entry
+        console.log(`add new entry`);
+        await addFollowersEntry(fid, stats);
+      }
     }
 
     // Calculate the total number of followers
-    const totalFollowers = followers.reduce((acc, follower) => acc + follower.followerCount, 0);
+    const totalFollowers = followers.reduce(
+      (acc, follower) => acc + follower.followerCount,
+      0
+    );
     console.log(totalFollowers);
 
     const svg = await satori(
-        <div
+      <div
         style={{
           width: "100%",
           height: "100%",
@@ -65,14 +72,14 @@ export default async function handler(
             padding: 20,
           }}
         >
-            <p
-                style={{
-                color: `#fff`,
-                padding: 10,
-                }}
-            >
-                Total follower power: {totalFollowers}
-            </p>
+          <p
+            style={{
+              color: `#fff`,
+              padding: 10,
+            }}
+          >
+            Total follower power: {totalFollowers}
+          </p>
         </div>
       </div>,
       {
