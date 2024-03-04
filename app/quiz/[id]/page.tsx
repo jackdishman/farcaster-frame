@@ -1,10 +1,23 @@
 import { Metadata, ResolvingMetadata } from "next";
-import { getQuiz } from "@/middleware/supabase";
+import { getQuiz, getSubmissions } from "@/middleware/supabase";
+import { getFnameByFid } from "@/middleware/airstack";
+import FarcasterWrapper from "../FarcasterWrapper";
+import ShareQuiz from "./ShareQuiz";
+import SubmissionList from "./SubmissionList";
 
 type Props = {
   params: { id: string };
   searchParams: { [key: string]: string | string[] | undefined };
 };
+
+async function getQuizSubmissions(quizId: string) {
+  try {
+    const res = await getSubmissions(quizId);
+    return res;
+  } catch (error) {
+    console.error("Error fetching submissions", error);
+  }
+}
 
 export async function generateMetadata(
   { params, searchParams }: Props,
@@ -20,14 +33,14 @@ export async function generateMetadata(
         title: "Quiz not found",
         description: "Quiz not found",
       },
-      metadataBase: new URL(process.env["HOST"] || ""),
+      metadataBase: new URL(process.env["NEXT_PUBLIC_HOST"] || ""),
     };
   }
 
-  const imageUrl = `${process.env["HOST"]}/api/quiz/image?title=${quiz.title}&description=${quiz.description}`;
+  const imageUrl = `${process.env["NEXT_PUBLIC_HOST"]}/api/quiz/image?title=${quiz.title}&description=${quiz.description}`;
   const fcMetadata: Record<string, string> = {
     "fc:frame": "vNext",
-    "fc:frame:post_url": `${process.env["HOST"]}/api/quiz/question?quiz_id=${id}&question_id=${quiz.first_question_id}`,
+    "fc:frame:post_url": `${process.env["NEXT_PUBLIC_HOST"]}/api/quiz/question?quiz_id=${id}&question_id=${quiz.first_question_id}`,
     "fc:frame:image": imageUrl,
     "fc:frame:button:1": `Start ${quiz.title}`,
   };
@@ -42,13 +55,12 @@ export async function generateMetadata(
     other: {
       ...fcMetadata,
     },
-    metadataBase: new URL(process.env["HOST"] || ""),
+    metadataBase: new URL(process.env["NEXT_PUBLIC_HOST"] || ""),
   };
 }
 
 export default async function Page({ params }: { params: { id: string } }) {
   const quiz = await getQuiz(params.id);
-  console.log(quiz);
   if (!quiz) {
     return (
       <div>
@@ -56,30 +68,40 @@ export default async function Page({ params }: { params: { id: string } }) {
       </div>
     );
   }
+
+  const fname = quiz.proctor_fid ? await getFnameByFid(quiz.proctor_fid) : "";
+  const submissions = await getQuizSubmissions(params.id);
+
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen py-2">
-      <main className="flex flex-col items-center justify-center flex-1 px-4 sm:px-20 text-center">
-        <h1 className="text-2xl">{quiz.title}</h1>
-        <p>{quiz.description}</p>
-        <img
-          src={
-            process.env[`HOST`] +
-            `/api/quiz/image?title=${quiz.title}&description=${quiz.description}`
-          }
-        />
-        <img
-          src={
-            process.env[`HOST`] +
-            `/api/quiz/image-question?text=${`In what year was the USS constitution created and for how long did it sail?`}&time=12mins&progress=${"1/10"}`
-          }
-        />
-        <img
-          src={
-            process.env[`HOST`] +
-            `/api/quiz/image-result?explanation=${`In what year was the USS constitution created and for how long did it sail?`}&time=12mins&progress=${"1/10"}&correct=${true}`
-          }
-        />
-      </main>
-    </div>
+    <FarcasterWrapper>
+      <div className="flex flex-col items-center justify-center min-h-screen py-2">
+        <main className="flex flex-col items-center justify-center flex-1 px-4 sm:px-20 text-center">
+          <h1 className="text-4xl">{quiz.title}</h1>
+          <h6 className="text-xl">{quiz.description}</h6>
+          <p>
+            by {fname} ({quiz.proctor_fid})
+          </p>
+          {/* copy quiz to clipboard */}
+          <div className="my-4 w-full">
+            <ShareQuiz quiz={quiz} />
+          </div>
+          <img
+            src={
+              process.env[`NEXT_PUBLIC_HOST`] +
+              `/api/quiz/image?title=${quiz.title}&description=${quiz.description}`
+            }
+          />
+          {/* quiz stats */}
+          <div className="my-4 w-full">
+            <h2>Quiz Stats</h2>
+            {submissions && submissions.length > 0 ? (
+              <SubmissionList submissions={submissions} />
+            ) : (
+              <p>No submissions yet</p>
+            )}
+          </div>
+        </main>
+      </div>
+    </FarcasterWrapper>
   );
 }

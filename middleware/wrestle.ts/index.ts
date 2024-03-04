@@ -1,5 +1,5 @@
 import { createClient } from "@supabase/supabase-js";
-import { IMatch } from "@/app/types/wrestle";
+import { IMatch } from "@/types/wrestle";
 
 const supabase = createClient(
   process.env["SUPABASE_URL"] ?? ``,

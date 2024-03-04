@@ -7,7 +7,7 @@ async function sendPendingOpponent(
     opponent_fname: string,
     challenger_fname: string
     ) {
-    const imageUrl = `${process.env["HOST"]}/api/wrestle/pending-opponent?opponent_fname=${opponent_fname}&challenger_fname=${challenger_fname}`;
+    const imageUrl = `${process.env["NEXT_PUBLIC_HOST"]}/api/wrestle/pending-opponent?opponent_fname=${opponent_fname}&challenger_fname=${challenger_fname}`;
     res.setHeader("Content-Type", "text/html");
     res.status(200).send(`
     <!DOCTYPE html>
@@ -19,7 +19,7 @@ async function sendPendingOpponent(
         <meta property="og:image" content="${imageUrl}">
         <meta name="fc:frame:image" content="${imageUrl}">
 
-        <meta name="fc:frame:post_url" content="${process.env["HOST"]}/api/wrestle/completed-matches">
+        <meta name="fc:frame:post_url" content="${process.env["NEXT_PUBLIC_HOST"]}/api/wrestle/completed-matches">
         <meta name="fc:frame:button:1" content="Completed Matches">
 
         </head>
@@ -39,7 +39,7 @@ async function sendPendingOpponent(
     challenger_score: number,
   ) {
     // show winner or loser image
-    const imageUrl = `${process.env["HOST"]}/api/wrestle/final-results-image?opponent_fname=${opponent_fname}&challenger_fname=${challenger_fname}&opponent_score=${opponent_score}&challenger_score=${challenger_score}`;
+    const imageUrl = `${process.env["NEXT_PUBLIC_HOST"]}/api/wrestle/final-results-image?opponent_fname=${opponent_fname}&challenger_fname=${challenger_fname}&opponent_score=${opponent_score}&challenger_score=${challenger_score}`;
     res.setHeader("Content-Type", "text/html");
     res.status(200).send(`
     <!DOCTYPE html>
@@ -51,7 +51,7 @@ async function sendPendingOpponent(
         <meta property="og:image" content="${imageUrl}">
         <meta name="fc:frame:image" content="${imageUrl}">
   
-        <meta name="fc:frame:post_url" content="${process.env["HOST"]}/api/wrestle/completed-matches">
+        <meta name="fc:frame:post_url" content="${process.env["NEXT_PUBLIC_HOST"]}/api/wrestle/completed-matches">
         <meta name="fc:frame:button:1" content="Completed Matches">
       
         </head>

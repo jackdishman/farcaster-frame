@@ -5,7 +5,7 @@ import {
   getQuestions,
   updateSubmission,
 } from "@/middleware/supabase";
-import { ISubmission, IQuestion } from "@/app/types/types";
+import { ISubmission, IQuestion } from "@/types/types";
 import { validateMessage } from "@/middleware/farcaster";
 import { getElapsedTimeString } from "@/middleware/helpers";
 
@@ -18,9 +18,9 @@ function sendResponse(
   progress: string
 ) {
   //   get next question
-  const nextQuestionLink = `${process.env["HOST"]}/api/quiz/question?quiz_id=${quizId}&question_id=${currentQuestion.next_question_id}`;
-  const resultsLink = `${process.env["HOST"]}/api/quiz/results?quiz_id=${quizId}`;
-  const imageUrl = `${process.env["HOST"]}/api/quiz/image-result?correct=${isCorrect}&explanation=${currentQuestion.explanation}&time=${elapsedTime}&progress=${progress}`;
+  const nextQuestionLink = `${process.env["NEXT_PUBLIC_HOST"]}/api/quiz/question?quiz_id=${quizId}&question_id=${currentQuestion.next_question_id}`;
+  const resultsLink = `${process.env["NEXT_PUBLIC_HOST"]}/api/quiz/results?quiz_id=${quizId}`;
+  const imageUrl = `${process.env["NEXT_PUBLIC_HOST"]}/api/quiz/image-result?correct=${isCorrect}&explanation=${currentQuestion.explanation}&time=${elapsedTime}&progress=${progress}`;
   res.setHeader("Content-Type", "text/html");
   res.status(200).send(`
         <!DOCTYPE html>
